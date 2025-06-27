@@ -21,16 +21,15 @@ Best Practices
 - Always use omitempty with _id field to allow MongoDB auto-generation
 */
 type Link struct {
-	ID         bson.ObjectID     `bson:"_id,omitempty"` // id
-	TenantID   string            `bson:"tenant_id"`     // tenant id
-	Url        string            `bson:"url"`           // original url
-	Metadata   map[string]string `bson:"metadata"`      // metadata
-	ShortID    string            `bson:"short_id"`      // short id
+	ID         bson.ObjectID `bson:"_id,omitempty"` // id
+	TenantID   string        `bson:"tenant_id"`     // tenant id
+	Url        string        `bson:"url"`           // original url
+	ShortID    string        `bson:"short_id"`      // short id
 	BaseEntity `bson:",inline"`
 }
 
-func (f *Link) SetShortID() error {
-	if f.ShortID != "" {
+func (l *Link) SetShortID() error {
+	if l.ShortID != "" {
 		return nil
 	}
 
@@ -38,24 +37,24 @@ func (f *Link) SetShortID() error {
 	if err != nil {
 		return err
 	}
-	f.ShortID = id
+	l.ShortID = id
 	return nil
 }
 
-func (f *Link) SetCreatedAt() {
-	if f.CreatedAt.IsZero() {
-		f.CreatedAt = time.Now().UTC()
+func (l *Link) SetCreatedAt() {
+	if l.CreatedAt.IsZero() {
+		l.CreatedAt = time.Now().UTC()
 	}
 }
 
-func (f *Link) SetUpdatedAt() {
-	f.UpdatedAt = time.Now().UTC()
+func (l *Link) SetUpdatedAt() {
+	l.UpdatedAt = time.Now().UTC()
 }
 
-func (f *Link) SoftDelete() {
+func (l *Link) SoftDelete() {
 	now := time.Now().UTC()
-	f.DeletedAt = &now
-	f.SetUpdatedAt()
+	l.DeletedAt = &now
+	l.SetUpdatedAt()
 }
 
 func (f *Link) ConstructFixedUrl(baseUrl string) string {

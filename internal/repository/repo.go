@@ -10,6 +10,8 @@ import (
 
 type Repo interface {
 	LinkRepo
+	TrackingSettingRepo
+	TrackRepo
 }
 
 type RepoCloser interface {
@@ -20,6 +22,8 @@ type RepoCloser interface {
 type repo struct {
 	client *mongo.Client
 	LinkRepo
+	TrackingSettingRepo
+	TrackRepo
 }
 
 func NewRepo(config *core.Config) (RepoCloser, error) {
@@ -31,10 +35,14 @@ func NewRepo(config *core.Config) (RepoCloser, error) {
 	db := client.Database(config.MongoDBName)
 
 	linkRepo := NewLinkRepo(db)
+	trackingSettingRepo := NewTrackingSettingRepo(db)
+	trackRepo := NewTrackRepo(db, trackingSettingRepo)
 
 	return &repo{
-		client:   client,
-		LinkRepo: linkRepo,
+		client:              client,
+		LinkRepo:            linkRepo,
+		TrackingSettingRepo: trackingSettingRepo,
+		TrackRepo:           trackRepo,
 	}, nil
 }
 

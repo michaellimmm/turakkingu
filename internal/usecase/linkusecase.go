@@ -26,7 +26,7 @@ func NewLinkUseCase(config *core.Config, repo repository.Repo) LinkUseCase {
 }
 
 func (l *linkUseCase) CreateLink(ctx context.Context, link *entity.Link) error {
-	err := l.repo.Create(ctx, link)
+	err := l.repo.CreateLink(ctx, link)
 	if err != nil {
 		slog.Error("failed to create link", slog.String("error", err.Error()))
 		return err
@@ -35,7 +35,7 @@ func (l *linkUseCase) CreateLink(ctx context.Context, link *entity.Link) error {
 }
 
 func (l *linkUseCase) GetFixedLink(ctx context.Context, id string) (*entity.Link, error) {
-	link, err := l.repo.FindByShortID(ctx, id)
+	link, err := l.repo.FindLinkByShortID(ctx, id)
 	if err != nil {
 		slog.Error("failed to get link", slog.String("error", err.Error()))
 		return nil, err

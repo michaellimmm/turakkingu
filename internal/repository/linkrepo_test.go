@@ -20,7 +20,6 @@ import (
 type TestSuiteLinkRepo struct {
 	mongoContainer testcontainers.Container
 	client         *mongo.Client
-	database       *mongo.Database
 	repo           repository.LinkRepo
 }
 
@@ -48,7 +47,6 @@ func setupTestSuiteLinkRepo() (*TestSuiteLinkRepo, error) {
 	return &TestSuiteLinkRepo{
 		mongoContainer: mongodbContainer,
 		client:         client,
-		database:       database,
 		repo:           repo,
 	}, nil
 }
@@ -74,11 +72,12 @@ func TestLinkRepo_Create(t *testing.T) {
 			TenantID: "tenat1",
 			Url:      "https://www.github.com",
 		}
-		err := suite.repo.Create(ctx, link)
+		err := suite.repo.CreateLink(ctx, link)
 
 		assert.NoError(t, err)
 		assert.False(t, link.ID.IsZero(), "ID should be generated")
-		assert.NotEmpty(t, link.ShortID, "ShortID should be emtpry")
+		assert.NotEmpty(t, link.TenantID, "TenantID should not be empty")
+		assert.NotEmpty(t, link.ShortID, "ShortID should not be empty")
 		assert.False(t, link.CreatedAt.IsZero(), "CreatedAt should be setted")
 		assert.False(t, link.UpdatedAt.IsZero(), "UpdatedAt should be setted")
 		assert.Nil(t, link.DeletedAt, "DeletedAt should be nil")
@@ -96,16 +95,15 @@ func TestLinkRepo_FindByID(t *testing.T) {
 			TenantID: "tenat1",
 			Url:      "https://www.github.com",
 		}
-		err := suite.repo.Create(ctx, link)
+		err := suite.repo.CreateLink(ctx, link)
 		assert.NoError(t, err)
 
-		foundLink, err := suite.repo.FindByID(ctx, link.ID.Hex())
+		foundLink, err := suite.repo.FindLinkByID(ctx, link.ID.Hex())
 
 		assert.NoError(t, err)
 		assert.Equal(t, foundLink.ID, link.ID)
 		assert.Equal(t, foundLink.ShortID, link.ShortID)
 		assert.Equal(t, foundLink.TenantID, link.TenantID)
-		assert.Equal(t, foundLink.Metadata, link.Metadata)
 		assert.Equal(t, foundLink.Url, link.Url)
 		assert.Nil(t, foundLink.DeletedAt)
 	})
@@ -113,7 +111,7 @@ func TestLinkRepo_FindByID(t *testing.T) {
 	t.Run("should return error for non-existing link", func(t *testing.T) {
 		nonExistentID := bson.NewObjectID()
 
-		link, err := suite.repo.FindByID(ctx, nonExistentID.Hex())
+		link, err := suite.repo.FindLinkByID(ctx, nonExistentID.Hex())
 		assert.Error(t, err)
 		assert.Nil(t, link)
 	})
@@ -133,16 +131,15 @@ func TestLinkRepo_FindByShortID(t *testing.T) {
 			Url:      "https://www.github.com",
 			ShortID:  id,
 		}
-		err = suite.repo.Create(ctx, link)
+		err = suite.repo.CreateLink(ctx, link)
 		assert.NoError(t, err)
 
-		foundLink, err := suite.repo.FindByShortID(ctx, id)
+		foundLink, err := suite.repo.FindLinkByShortID(ctx, id)
 
 		assert.NoError(t, err)
 		assert.Equal(t, foundLink.ID, link.ID)
 		assert.Equal(t, foundLink.ShortID, link.ShortID)
 		assert.Equal(t, foundLink.TenantID, link.TenantID)
-		assert.Equal(t, foundLink.Metadata, link.Metadata)
 		assert.Equal(t, foundLink.Url, link.Url)
 		assert.Nil(t, foundLink.DeletedAt)
 	})
@@ -151,7 +148,7 @@ func TestLinkRepo_FindByShortID(t *testing.T) {
 		nonExistentID, err := gonanoid.New()
 		assert.NoError(t, err)
 
-		link, err := suite.repo.FindByShortID(ctx, nonExistentID)
+		link, err := suite.repo.FindLinkByShortID(ctx, nonExistentID)
 		assert.Error(t, err)
 		assert.Nil(t, link)
 	})

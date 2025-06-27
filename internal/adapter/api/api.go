@@ -18,9 +18,13 @@ type api struct {
 
 func NewApi(config *core.Config, uc usecase.UseCase) API {
 	linkApi := NewLinkAPI(config, uc)
+	trackingAPI := NewTrackAPI(config, uc)
+	trackingSettingAPI := NewTrackingSettingAPI(config, uc)
 
 	router := &router{
-		linkApi: linkApi,
+		linkApi:            linkApi,
+		trackingAPI:        trackingAPI,
+		trackingSettingAPI: trackingSettingAPI,
 	}
 
 	server := &http.Server{
@@ -46,13 +50,23 @@ func (a *api) Close(ctx context.Context) error {
 }
 
 type router struct {
-	linkApi LinkAPI
+	linkApi            LinkAPI
+	trackingAPI        TrackAPI
+	trackingSettingAPI TrackingSettingAPI
 }
 
 func (r *router) Mux() *http.ServeMux {
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /v1/links", r.linkApi.Create)
+	fs := http.FileServer(http.Dir("static"))
+	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	mux.HandleFunc("POST /v1/links", r.linkApi.CreateLink)
 	mux.HandleFunc("GET /r/{id}", r.linkApi.Redirect)
+
+	mux.HandleFunc("GET /v1/tenants/{tenant_id}/tracking-setting", r.trackingSettingAPI.GetTrackingSetting)
+
+	mux.HandleFunc("POST /v1/tracks", r.trackingAPI.CreateTrack)
+	mux.HandleFunc("POST /v1/tracks/events", r.trackingAPI.TrackEvent)
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {

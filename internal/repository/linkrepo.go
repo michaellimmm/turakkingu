@@ -10,9 +10,9 @@ import (
 )
 
 type LinkRepo interface {
-	Create(context.Context, *entity.Link) error
-	FindByID(context.Context, string) (*entity.Link, error)
-	FindByShortID(context.Context, string) (*entity.Link, error)
+	CreateLink(context.Context, *entity.Link) error
+	FindLinkByID(context.Context, string) (*entity.Link, error)
+	FindLinkByShortID(context.Context, string) (*entity.Link, error)
 }
 
 type linkRepo struct {
@@ -27,7 +27,7 @@ func NewLinkRepo(db *mongo.Database) LinkRepo {
 	}
 }
 
-func (l *linkRepo) Create(ctx context.Context, link *entity.Link) error {
+func (r *linkRepo) CreateLink(ctx context.Context, link *entity.Link) error {
 	err := link.SetShortID()
 	if err != nil {
 		return fmt.Errorf("failed to set short id")
@@ -36,7 +36,7 @@ func (l *linkRepo) Create(ctx context.Context, link *entity.Link) error {
 	link.SetCreatedAt()
 	link.SetUpdatedAt()
 
-	res, err := l.collection.InsertOne(ctx, link)
+	res, err := r.collection.InsertOne(ctx, link)
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func (l *linkRepo) Create(ctx context.Context, link *entity.Link) error {
 	return nil
 }
 
-func (l *linkRepo) FindByID(ctx context.Context, id string) (*entity.Link, error) {
+func (r *linkRepo) FindLinkByID(ctx context.Context, id string) (*entity.Link, error) {
 	oid, err := bson.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, fmt.Errorf("id is not valid")
@@ -56,21 +56,21 @@ func (l *linkRepo) FindByID(ctx context.Context, id string) (*entity.Link, error
 		"deletedAt": bson.M{"$exists": false},
 	}
 
-	err = l.collection.FindOne(ctx, filter).Decode(&link)
+	err = r.collection.FindOne(ctx, filter).Decode(&link)
 	if err != nil {
 		return nil, err
 	}
 	return &link, nil
 }
 
-func (l *linkRepo) FindByShortID(ctx context.Context, id string) (*entity.Link, error) {
+func (r *linkRepo) FindLinkByShortID(ctx context.Context, id string) (*entity.Link, error) {
 	var link entity.Link
 	filter := bson.M{
 		"short_id":  id,
 		"deletedAt": bson.M{"$exists": false},
 	}
 
-	err := l.collection.FindOne(ctx, filter).Decode(&link)
+	err := r.collection.FindOne(ctx, filter).Decode(&link)
 	if err != nil {
 		return nil, err
 	}

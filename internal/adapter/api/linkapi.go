@@ -13,14 +13,13 @@ import (
 )
 
 type LinkAPI interface {
-	Create(w http.ResponseWriter, r *http.Request)
+	CreateLink(w http.ResponseWriter, r *http.Request)
 	Redirect(w http.ResponseWriter, r *http.Request)
 }
 
 type CreateLinkRequest struct {
-	TenantID string            `json:"tenant_id"`
-	Url      string            `json:"url"`
-	Metadata map[string]string `json:"metadata"`
+	TenantID string `json:"tenant_id"`
+	Url      string `json:"url"`
 }
 
 func (c *CreateLinkRequest) Validate() error {
@@ -51,19 +50,19 @@ type CreateLinkResponse struct {
 	Link string `json:"link"`
 }
 
-type link struct {
+type linkAPI struct {
 	uc     usecase.UseCase
 	config *core.Config
 }
 
 func NewLinkAPI(config *core.Config, uc usecase.UseCase) LinkAPI {
-	return &link{
+	return &linkAPI{
 		uc:     uc,
 		config: config,
 	}
 }
 
-func (f *link) Create(w http.ResponseWriter, r *http.Request) {
+func (f *linkAPI) CreateLink(w http.ResponseWriter, r *http.Request) {
 	req := &CreateLinkRequest{}
 	err := req.FromReader(r.Body)
 	if err != nil {
@@ -82,7 +81,6 @@ func (f *link) Create(w http.ResponseWriter, r *http.Request) {
 	link := &entity.Link{
 		Url:      req.Url,
 		TenantID: req.TenantID,
-		Metadata: req.Metadata,
 	}
 	err = f.uc.CreateLink(r.Context(), link)
 	if err != nil {
@@ -94,7 +92,7 @@ func (f *link) Create(w http.ResponseWriter, r *http.Request) {
 	sendJson(w, http.StatusCreated, CreateLinkResponse{Link: link.ConstructFixedUrl(f.config.Domain)})
 }
 
-func (f *link) Redirect(w http.ResponseWriter, r *http.Request) {
+func (f *linkAPI) Redirect(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	link, err := f.uc.GetFixedLink(r.Context(), id)
 	if err != nil {
