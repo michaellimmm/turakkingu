@@ -9,6 +9,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -50,6 +51,11 @@ func (r *CreateTrackRequest) Validate() error {
 
 	if r.URL == "" {
 		return fmt.Errorf("url can not be empty")
+	}
+
+	_, err := url.ParseRequestURI(r.URL)
+	if err != nil {
+		return fmt.Errorf("url is not valid")
 	}
 
 	if r.EndUserID == "" {
@@ -127,7 +133,12 @@ func (t *trackAPI) CreateTrack(w http.ResponseWriter, r *http.Request) {
 		GeneratedFrom:     req.GeneratedFrom,
 		Metadata:          req.Metadata,
 	}
-	t.uc.CreateTrack(r.Context(), track)
+	err = t.uc.CreateTrack(r.Context(), track)
+	if err != nil {
+		slog.Error("failed to create new track", slog.String("error", err.Error()))
+		sendError(w, http.StatusInternalServerError, fmt.Errorf("failed to create new track"))
+		return
+	}
 
 	sendJson(w, http.StatusCreated, CreateTrackResponse{
 		ID:        track.ID.Hex(),

@@ -18,6 +18,7 @@ type TrackingSettingRepo interface {
 	FindOrCreateWithPagesByTenantID(ctx context.Context, tenantID string) (*entity.TrackingSettingWithPages, error)
 	ValidateTrackingSettingIDs(ctx context.Context, ids []bson.ObjectID) (map[bson.ObjectID]bool, error)
 	FindTrackingSettingByID(ctx context.Context, id bson.ObjectID) (*entity.TrackingSetting, error)
+	FindTrackingSettingWithPagesByID(ctx context.Context, trackingSettingID bson.ObjectID) (*entity.TrackingSettingWithPages, error)
 	ExistsByID(ctx context.Context, id bson.ObjectID) (bool, error)
 }
 
@@ -35,7 +36,7 @@ func NewTrackingSettingRepo(db *mongo.Database) TrackingSettingRepo {
 
 func (r *trackingSettingRepo) FindOrCreateWithPagesByTenantID(ctx context.Context,
 	tenantID string) (*entity.TrackingSettingWithPages, error) {
-	existing, err := r.FindByTenantIDWithPages(ctx, tenantID)
+	existing, err := r.FindTrakingSettingWithPagesByTenantID(ctx, tenantID)
 	if err == nil {
 		return existing, nil
 	}
@@ -68,7 +69,42 @@ func (r *trackingSettingRepo) FindOrCreateWithPagesByTenantID(ctx context.Contex
 	return result, nil
 }
 
-func (r *trackingSettingRepo) FindByTenantIDWithPages(ctx context.Context,
+func (r *trackingSettingRepo) FindTrackingSettingWithPagesByID(ctx context.Context,
+	trackingSettingID bson.ObjectID) (*entity.TrackingSettingWithPages, error) {
+	pipeline := []bson.M{
+		{
+			"$match": bson.M{"_id": trackingSettingID},
+		},
+		{
+			"$lookup": bson.M{
+				"from":         "thank_you_page",
+				"localField":   "_id",
+				"foreignField": "tracking_setting_id",
+				"as":           "thank_you_pages",
+			},
+		},
+	}
+
+	cursor, err := r.collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		slog.Error("failed to aggregate tracking setting", slog.String("error", err.Error()))
+		return nil, fmt.Errorf("failed to aggregate tracking setting: %w", err)
+	}
+	defer cursor.Close(ctx)
+
+	var results []entity.TrackingSettingWithPages
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, fmt.Errorf("failed to decode result: %w", err)
+	}
+
+	if len(results) == 0 {
+		return nil, mongo.ErrNoDocuments
+	}
+
+	return &results[0], nil
+}
+
+func (r *trackingSettingRepo) FindTrakingSettingWithPagesByTenantID(ctx context.Context,
 	tenantID string) (*entity.TrackingSettingWithPages, error) {
 	pipeline := []bson.M{
 		{
@@ -76,7 +112,7 @@ func (r *trackingSettingRepo) FindByTenantIDWithPages(ctx context.Context,
 		},
 		{
 			"$lookup": bson.M{
-				"from":         "thank_you_pages",
+				"from":         "thank_you_page",
 				"localField":   "_id",
 				"foreignField": "tracking_setting_id",
 				"as":           "thank_you_pages",

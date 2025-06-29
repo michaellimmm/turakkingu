@@ -5,6 +5,8 @@ import (
 	"github/michaellimmm/turakkingu/internal/core"
 	"github/michaellimmm/turakkingu/internal/usecase"
 	"net/http"
+
+	"github.com/rs/cors"
 )
 
 type API interface {
@@ -26,10 +28,9 @@ func NewApi(config *core.Config, uc usecase.UseCase) API {
 		trackingAPI:        trackingAPI,
 		trackingSettingAPI: trackingSettingAPI,
 	}
-
 	server := &http.Server{
 		Addr:    config.HttpPort,
-		Handler: router.Mux(),
+		Handler: cors.Default().Handler(router.Mux()),
 	}
 
 	return &api{
@@ -63,7 +64,8 @@ func (r *router) Mux() *http.ServeMux {
 	mux.HandleFunc("POST /v1/links", r.linkApi.CreateLink)
 	mux.HandleFunc("GET /r/{id}", r.linkApi.Redirect)
 
-	mux.HandleFunc("GET /v1/tenants/{tenant_id}/tracking-setting", r.trackingSettingAPI.GetTrackingSetting)
+	mux.HandleFunc("GET /v1/tenants/{tenant_id}/tracking-settings", r.trackingSettingAPI.GetTrackingSetting)
+	mux.HandleFunc("POST /v1/tracking-settings/pages", r.trackingSettingAPI.AddThankYouPage)
 
 	mux.HandleFunc("POST /v1/tracks", r.trackingAPI.CreateTrack)
 	mux.HandleFunc("POST /v1/tracks/events", r.trackingAPI.TrackEvent)

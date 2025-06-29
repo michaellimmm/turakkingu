@@ -17,13 +17,15 @@ type ThankYouPageRepo interface {
 }
 
 type thankYouPageRepo struct {
-	collection *mongo.Collection
+	collection          *mongo.Collection
+	trackingSettingRepo TrackingSettingRepo
 }
 
-func NewThankYouPageRepo(db *mongo.Database) ThankYouPageRepo {
+func NewThankYouPageRepo(db *mongo.Database, trackingSettingRepo TrackingSettingRepo) ThankYouPageRepo {
 	collection := db.Collection("thank_you_page")
 	return &thankYouPageRepo{
-		collection: collection,
+		collection:          collection,
+		trackingSettingRepo: trackingSettingRepo,
 	}
 }
 
@@ -32,6 +34,20 @@ func (r *thankYouPageRepo) CreatePage(ctx context.Context, page *entity.ThankYou
 	page.BaseEntity.CreatedAt = now
 	page.BaseEntity.UpdatedAt = now
 
+	err := r.validateTrackingSettingID(ctx, page.TrackingSettingID)
+	if err != nil {
+		return err
+	}
+
+	isExist, err := r.ExistByUrls(ctx, page.TrackingSettingID, page.URL)
+	if err != nil {
+		return fmt.Errorf("failed to validate url: %w", err)
+	}
+
+	if isExist {
+		return fmt.Errorf("url %s does exist", page.URL)
+	}
+
 	result, err := r.collection.InsertOne(ctx, page)
 	if err != nil {
 		return fmt.Errorf("failed to create thank you page: %w", err)
@@ -39,6 +55,33 @@ func (r *thankYouPageRepo) CreatePage(ctx context.Context, page *entity.ThankYou
 
 	page.ID = result.InsertedID.(bson.ObjectID)
 	return nil
+}
+
+func (r *thankYouPageRepo) validateTrackingSettingID(ctx context.Context, trackingSettingID bson.ObjectID) error {
+	if trackingSettingID.IsZero() {
+		return errors.New("tracking_setting_id is required")
+	}
+
+	exists, err := r.trackingSettingRepo.ExistsByID(ctx, trackingSettingID)
+	if err != nil {
+		return fmt.Errorf("failed to check tracking setting existence: %w", err)
+	}
+
+	if !exists {
+		return fmt.Errorf("trackign setting with ID %s does not exist", trackingSettingID.Hex())
+	}
+
+	return nil
+}
+
+func (r *thankYouPageRepo) ExistByUrls(ctx context.Context, trackingSettingID bson.ObjectID, url string) (bool, error) {
+	filter := bson.M{
+		"tracking_setting_id": trackingSettingID,
+		"url":                 url,
+	}
+
+	count, err := r.collection.CountDocuments(ctx, filter)
+	return count > 0, err
 }
 
 func (r *thankYouPageRepo) UpdatePageFieldsAndReturn(ctx context.Context, id bson.ObjectID,
