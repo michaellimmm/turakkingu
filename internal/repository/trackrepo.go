@@ -12,6 +12,7 @@ import (
 
 type TrackRepo interface {
 	CreateTrack(ctx context.Context, track *entity.Track) error
+	IsTrackIDExist(ctx context.Context, id bson.ObjectID) (bool, error)
 }
 
 type trackRepo struct {
@@ -49,7 +50,7 @@ func (r *trackRepo) validateTrackingSettingID(ctx context.Context, trackingSetti
 		return errors.New("tracking_setting_id is required")
 	}
 
-	exists, err := r.trackingSettingRepo.ExistsByID(ctx, trackingSettingID)
+	exists, err := r.trackingSettingRepo.IsTrackingSettingIDExist(ctx, trackingSettingID)
 	if err != nil {
 		return fmt.Errorf("failed to check tracking setting existence: %w", err)
 	}
@@ -59,4 +60,11 @@ func (r *trackRepo) validateTrackingSettingID(ctx context.Context, trackingSetti
 	}
 
 	return nil
+}
+
+func (r *trackRepo) IsTrackIDExist(ctx context.Context, id bson.ObjectID) (bool, error) {
+	filter := bson.M{"_id": id}
+
+	count, err := r.collection.CountDocuments(ctx, filter)
+	return count > 0, err
 }

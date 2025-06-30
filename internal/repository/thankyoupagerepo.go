@@ -31,15 +31,15 @@ func NewThankYouPageRepo(db *mongo.Database, trackingSettingRepo TrackingSetting
 
 func (r *thankYouPageRepo) CreatePage(ctx context.Context, page *entity.ThankYouPage) error {
 	now := time.Now()
-	page.BaseEntity.CreatedAt = now
-	page.BaseEntity.UpdatedAt = now
+	page.CreatedAt = now
+	page.UpdatedAt = now
 
 	err := r.validateTrackingSettingID(ctx, page.TrackingSettingID)
 	if err != nil {
 		return err
 	}
 
-	isExist, err := r.ExistByUrls(ctx, page.TrackingSettingID, page.URL)
+	isExist, err := r.existByUrls(ctx, page.TrackingSettingID, page.URL)
 	if err != nil {
 		return fmt.Errorf("failed to validate url: %w", err)
 	}
@@ -62,19 +62,19 @@ func (r *thankYouPageRepo) validateTrackingSettingID(ctx context.Context, tracki
 		return errors.New("tracking_setting_id is required")
 	}
 
-	exists, err := r.trackingSettingRepo.ExistsByID(ctx, trackingSettingID)
+	exists, err := r.trackingSettingRepo.IsTrackingSettingIDExist(ctx, trackingSettingID)
 	if err != nil {
 		return fmt.Errorf("failed to check tracking setting existence: %w", err)
 	}
 
 	if !exists {
-		return fmt.Errorf("trackign setting with ID %s does not exist", trackingSettingID.Hex())
+		return fmt.Errorf("tracking setting with ID %s does not exist", trackingSettingID.Hex())
 	}
 
 	return nil
 }
 
-func (r *thankYouPageRepo) ExistByUrls(ctx context.Context, trackingSettingID bson.ObjectID, url string) (bool, error) {
+func (r *thankYouPageRepo) existByUrls(ctx context.Context, trackingSettingID bson.ObjectID, url string) (bool, error) {
 	filter := bson.M{
 		"tracking_setting_id": trackingSettingID,
 		"url":                 url,

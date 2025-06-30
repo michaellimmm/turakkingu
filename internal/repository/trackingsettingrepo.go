@@ -16,10 +16,9 @@ import (
 // get tracking settings
 type TrackingSettingRepo interface {
 	FindOrCreateWithPagesByTenantID(ctx context.Context, tenantID string) (*entity.TrackingSettingWithPages, error)
-	ValidateTrackingSettingIDs(ctx context.Context, ids []bson.ObjectID) (map[bson.ObjectID]bool, error)
 	FindTrackingSettingByID(ctx context.Context, id bson.ObjectID) (*entity.TrackingSetting, error)
 	FindTrackingSettingWithPagesByID(ctx context.Context, trackingSettingID bson.ObjectID) (*entity.TrackingSettingWithPages, error)
-	ExistsByID(ctx context.Context, id bson.ObjectID) (bool, error)
+	IsTrackingSettingIDExist(ctx context.Context, id bson.ObjectID) (bool, error)
 }
 
 type trackingSettingRepo struct {
@@ -144,7 +143,7 @@ func (r *trackingSettingRepo) UpdateFieldsAndReturn() {
 
 }
 
-func (r *trackingSettingRepo) ExistsByID(ctx context.Context, id bson.ObjectID) (bool, error) {
+func (r *trackingSettingRepo) IsTrackingSettingIDExist(ctx context.Context, id bson.ObjectID) (bool, error) {
 	filter := bson.M{"_id": id}
 
 	count, err := r.collection.CountDocuments(ctx, filter)
@@ -161,27 +160,4 @@ func (r *trackingSettingRepo) FindTrackingSettingByID(ctx context.Context, id bs
 	}
 
 	return &setting, nil
-}
-
-func (r *trackingSettingRepo) ValidateTrackingSettingIDs(ctx context.Context, ids []bson.ObjectID) (map[bson.ObjectID]bool, error) {
-	filter := bson.M{"_id": bson.M{"$in": ids}}
-
-	cursor, err := r.collection.Find(ctx, filter)
-	if err != nil {
-		return nil, fmt.Errorf("failed to validate tracking setting IDs: %w", err)
-	}
-	defer cursor.Close(ctx)
-
-	existingIDs := make(map[bson.ObjectID]bool)
-	for cursor.Next(ctx) {
-		var result struct {
-			ID bson.ObjectID `bson:"_id"`
-		}
-		if err := cursor.Decode(&result); err != nil {
-			return nil, fmt.Errorf("failed to decode validation result: %w", err)
-		}
-		existingIDs[result.ID] = true
-	}
-
-	return existingIDs, nil
 }

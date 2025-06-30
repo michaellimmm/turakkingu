@@ -13,6 +13,7 @@ type Repo interface {
 	TrackingSettingRepo
 	TrackRepo
 	ThankYouPageRepo
+	EventRepo
 }
 
 type RepoCloser interface {
@@ -26,6 +27,7 @@ type repo struct {
 	TrackingSettingRepo
 	TrackRepo
 	ThankYouPageRepo
+	EventRepo
 }
 
 func NewRepo(config *core.Config) (RepoCloser, error) {
@@ -40,6 +42,7 @@ func NewRepo(config *core.Config) (RepoCloser, error) {
 	trackingSettingRepo := NewTrackingSettingRepo(db)
 	trackRepo := NewTrackRepo(db, trackingSettingRepo)
 	thankYouPageRepo := NewThankYouPageRepo(db, trackingSettingRepo)
+	eventRepo := NewEventRepo(db, trackRepo)
 
 	return &repo{
 		client:              client,
@@ -47,6 +50,7 @@ func NewRepo(config *core.Config) (RepoCloser, error) {
 		TrackingSettingRepo: trackingSettingRepo,
 		TrackRepo:           trackRepo,
 		ThankYouPageRepo:    thankYouPageRepo,
+		EventRepo:           eventRepo,
 	}, nil
 }
 
