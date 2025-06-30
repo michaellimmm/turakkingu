@@ -7,7 +7,7 @@ import path from 'path';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    port: 8081,
+    port: 8082,
     host: true, // Needed to allow custom domains
     allowedHosts: ['cardealer.local', 'tracker.local', 'cardealerform.local'],
   },

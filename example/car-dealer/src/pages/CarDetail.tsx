@@ -139,14 +139,17 @@ const CarDetail = () => {
             </Card>
 
             <div className="space-y-4">
-              <Link to={`/quote/${car.id}`} className="block">
+              <a
+                href={`http://cardealerform.local/quote/${car.id}`}
+                className="block"
+              >
                 <Button
                   size="lg"
                   className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 text-lg rounded-xl transition-all duration-300 transform hover:scale-105"
                 >
                   Get Quote & Book Now
                 </Button>
-              </Link>
+              </a>
               <Link to="/">
                 <Button
                   variant="outline"

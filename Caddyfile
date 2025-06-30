@@ -1,0 +1,12 @@
+# Caddyfile
+tracker.local {
+    reverse_proxy localhost:8080
+}
+
+cardealer.local {
+    reverse_proxy localhost:8081
+}
+
+cardealerform.local {
+    reverse_proxy localhost:8082
+}

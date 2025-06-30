@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Quote = () => {
   const { id } = useParams();
+  console.log('id', id);
   const navigate = useNavigate();
   const car = cars.find((c) => c.id === id);
 
@@ -124,7 +124,7 @@ const Quote = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(-1)}
@@ -132,7 +132,7 @@ const Quote = () => {
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
-              </Button>
+              </Button> */}
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg"></div>
                 <h1 className="text-2xl font-bold text-gray-900">
