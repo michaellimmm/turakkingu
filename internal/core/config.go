@@ -10,6 +10,7 @@ type Config struct {
 	MongoDBUri  string
 	MongoDBName string
 	HttpPort    string
+	WebPort     string
 	Domain      string
 }
 
@@ -23,6 +24,7 @@ func NewConfig() (*Config, error) {
 		MongoDBUri:  os.Getenv("MONGODB_URI"),
 		MongoDBName: os.Getenv("MONGODB_NAME"),
 		HttpPort:    os.Getenv("HTTP_PORT"),
+		WebPort:     os.Getenv("WEB_PORT"),
 		Domain:      os.Getenv("DOMAIN"),
 	}
 

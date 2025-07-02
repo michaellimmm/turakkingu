@@ -3,6 +3,7 @@ package adapter
 import (
 	"context"
 	"github/michaellimmm/turakkingu/internal/adapter/api"
+	"github/michaellimmm/turakkingu/internal/adapter/web"
 	"github/michaellimmm/turakkingu/internal/core"
 	"github/michaellimmm/turakkingu/internal/usecase"
 
@@ -16,12 +17,15 @@ type AdapterCloser interface {
 
 type adapter struct {
 	api api.API
+	web web.Web
 }
 
 func NewAdapter(config *core.Config, uc usecase.UseCase) AdapterCloser {
 	api := api.NewApi(config, uc)
+	web := web.NewWeb(config, uc)
 	return &adapter{
 		api: api,
+		web: web,
 	}
 }
 
@@ -30,9 +34,13 @@ func (a *adapter) Run() error {
 
 	eg.Go(a.api.Run)
 
+	eg.Go(a.web.Run)
+
 	return eg.Wait()
 }
 
 func (a *adapter) Close(ctx context.Context) error {
-	return a.api.Close(ctx)
+	_ = a.api.Close(ctx)
+	_ = a.web.Close(ctx)
+	return nil
 }

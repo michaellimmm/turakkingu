@@ -6,7 +6,7 @@ import (
 )
 
 func render404(w http.ResponseWriter) {
-	tmpl, err := template.ParseFiles("./web/template/404.html")
+	tmpl, err := template.ParseFiles("./web/404.html")
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
