@@ -9,9 +9,13 @@ simple tracking
 - Go 1.23 or higher
 - [air](https://github.com/air-verse/air)
 - [caddy](https://caddyserver.com/docs/install)
-- install dependency `go mod tidy`
+- install bun
 
 ### How to run
+
+#### Backend
+
+- install dependency `go mod tidy`
 
 ```bash
 air
@@ -21,6 +25,26 @@ or
 
 ```bash
 go run main.go
+```
+
+#### Sample of client landing page
+
+- install dependecy
+
+```bash
+cd example/car-dealer
+bun install
+bun dev
+```
+
+#### Sample of client thank you page (cross-domain)
+
+- install dependecy
+
+```bash
+cd example/car-form
+bun install
+bun dev
 ```
 
 ### Enable Multi-domain

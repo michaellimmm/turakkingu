@@ -20,6 +20,7 @@ type TestSuiteTrackRepo struct {
 	client              *mongo.Client
 	trackRepo           repository.TrackRepo
 	trackingSettingRepo repository.TrackingSettingRepo
+	thankYouPageRepo    repository.ThankYouPageRepo
 }
 
 func setupTestSuiteTrackRepo() (*TestSuiteTrackRepo, error) {
@@ -43,11 +44,13 @@ func setupTestSuiteTrackRepo() (*TestSuiteTrackRepo, error) {
 	database := client.Database("test")
 	trackingSettingRepo := repository.NewTrackingSettingRepo(database)
 	repo := repository.NewTrackRepo(database, trackingSettingRepo)
+	thankYouPageRepo := repository.NewThankYouPageRepo(database, trackingSettingRepo)
 	return &TestSuiteTrackRepo{
 		mongoContainer:      mongodbContainer,
 		client:              client,
 		trackRepo:           repo,
 		trackingSettingRepo: trackingSettingRepo,
+		thankYouPageRepo:    thankYouPageRepo,
 	}, nil
 }
 
@@ -98,5 +101,41 @@ func TestTrackRepo_CreateTrack(t *testing.T) {
 		err = suite.trackRepo.CreateTrack(ctx, track)
 
 		assert.Error(t, err)
+	})
+}
+
+func TestTrackRepo_FindTrackByIDWithThankYoPages(t *testing.T) {
+	suite, err := setupTestSuiteTrackRepo()
+	assert.NoError(t, err)
+	defer suite.Cleanup()
+
+	ctx := context.Background()
+	t.Run("should return track with thank you page", func(t *testing.T) {
+		trackingSetting, err := suite.trackingSettingRepo.FindOrCreateWithPagesByTenantID(ctx, "tenant1")
+		assert.NoError(t, err)
+		thankYouPage := &entity.ThankYouPage{
+			TrackingSettingID: trackingSetting.ID,
+			URL:               "https://www.example.com/thank-you",
+			Name:              "thank you page",
+			Status:            entity.TrackingStatusPending,
+		}
+		err = suite.thankYouPageRepo.CreatePage(ctx, thankYouPage)
+		assert.NoError(t, err)
+		track := &entity.Track{
+			TrackingSettingID: trackingSetting.ID,
+			Url:               "https://www.example.com",
+			EndUserID:         "EndUserID12345",
+			SessionID:         "SessionID12345",
+			Platform:          "line",
+		}
+		err = suite.trackRepo.CreateTrack(ctx, track)
+		assert.NoError(t, err)
+
+		trackWithThankYouPages, err := suite.trackRepo.FindTrackByIDWithThankYouPages(ctx, track.ID)
+
+		assert.NoError(t, err)
+		assert.False(t, trackWithThankYouPages.ID.IsZero(), "ID should be generated")
+		assert.Equal(t, trackWithThankYouPages.TrackingSettingID, trackingSetting.ID)
+		assert.Equal(t, len(trackWithThankYouPages.ThankYouPages), 1)
 	})
 }

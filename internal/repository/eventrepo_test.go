@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/mongodb"
-	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
@@ -86,7 +85,7 @@ func TestEventRepo_CreateEvent(t *testing.T) {
 		assert.NoError(t, err)
 
 		event := &entity.Event{
-			TrackID:     track.ID,
+			TrackID:     "",
 			UserAgent:   "Mozilla/5.0",
 			Fingerprint: "fingerprint123456",
 			Url:         "http://www.example.com",
@@ -100,21 +99,6 @@ func TestEventRepo_CreateEvent(t *testing.T) {
 		assert.False(t, event.CreatedAt.IsZero(), "CreatedAt should be setted")
 		assert.False(t, event.UpdatedAt.IsZero(), "UpdatedAt should be setted")
 		assert.Nil(t, event.DeletedAt, "DeletedAt should be nil")
-	})
-
-	t.Run("should return error when track id is not found", func(t *testing.T) {
-		event := &entity.Event{
-			TrackID:     bson.NewObjectID(),
-			UserAgent:   "Mozilla/5.0",
-			Fingerprint: "fingerprint123456",
-			Url:         "http://www.example.com",
-			EventName:   entity.EventNameLandingPage,
-			PublishedAt: time.Now(),
-		}
-		err = suite.eventRepo.CreateEvent(ctx, event)
-
-		assert.Error(t, err)
-		assert.True(t, event.ID.IsZero(), "ID should be generated")
 	})
 }
 
@@ -138,7 +122,7 @@ func TestEventRepo_FindAllEventByTenantID(t *testing.T) {
 		assert.NoError(t, err)
 
 		event := &entity.Event{
-			TrackID:     track.ID,
+			TrackID:     track.ID.Hex(),
 			UserAgent:   "Mozilla/5.0",
 			Fingerprint: "fingerprint123456",
 			Url:         "http://www.example.com",
@@ -148,7 +132,7 @@ func TestEventRepo_FindAllEventByTenantID(t *testing.T) {
 		err = suite.eventRepo.CreateEvent(ctx, event)
 		assert.NoError(t, err)
 		event2 := &entity.Event{
-			TrackID:     track.ID,
+			TrackID:     track.ID.Hex(),
 			UserAgent:   "Mozilla/5.0",
 			Fingerprint: "fingerprint123456",
 			Url:         "http://www.example.com/2",
@@ -185,7 +169,7 @@ func TestEventRepo_FindLastEventByFingerprint(t *testing.T) {
 		assert.NoError(t, err)
 
 		event := &entity.Event{
-			TrackID:     track.ID,
+			TrackID:     track.ID.Hex(),
 			UserAgent:   "Mozilla/5.0",
 			Fingerprint: "fingerprint123456",
 			Url:         "http://www.example.com",

@@ -28,30 +28,8 @@ func (t *Track) SetUpdatedAt() {
 	t.UpdatedAt = time.Now().UTC()
 }
 
-type EventName string
-
-const (
-	EventNameLandingPage  EventName = "landing_page"
-	EventNameThankYouPage EventName = "thank_you_page"
-)
-
-type Event struct {
-	ID          bson.ObjectID `bson:"_id,omitempty"`
-	TrackID     bson.ObjectID `bson:"track_id"`
-	UserAgent   string        `bson:"user_agent"`
-	Fingerprint string        `bson:"fingerprint"`
-	Url         string        `bson:"url"`
-	EventName   EventName     `bson:"event_name"`
-	PublishedAt time.Time     `bson:"published_at"`
-	BaseEntity  `bson:",inline"`
-}
-
-func (t *Event) SetCreatedAt() {
-	if t.CreatedAt.IsZero() {
-		t.CreatedAt = time.Now().UTC()
-	}
-}
-
-func (t *Event) SetUpdatedAt() {
-	t.UpdatedAt = time.Now().UTC()
+type TrackWithThankYouPages struct {
+	Track           `bson:",inline"`
+	ThankYouPages   []*ThankYouPage  `bson:"thank_you_pages" json:"thank_you_pages"`
+	TrackingSetting *TrackingSetting `bson:"tracking_setting,omitempty" json:"tracking_setting,omitempty"`
 }

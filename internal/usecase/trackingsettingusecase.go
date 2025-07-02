@@ -49,6 +49,7 @@ func (uc *trackingSettingUseCase) GetTrackingSettingByID(ctx context.Context, tr
 }
 
 func (uc *trackingSettingUseCase) AddThankYouPage(ctx context.Context, thankYouPage *entity.ThankYouPage) error {
+	thankYouPage.Status = entity.TrackingStatusPending
 	err := uc.repo.CreatePage(ctx, thankYouPage)
 	if err != nil {
 		slog.Error("failed to add thank you page", slog.String("error", err.Error()))

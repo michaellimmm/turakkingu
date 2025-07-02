@@ -12,10 +12,15 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
+var (
+	ErrNoEvents = errors.New("no events found")
+)
+
 type EventRepo interface {
 	CreateEvent(ctx context.Context, event *entity.Event) error
 	FindAllEventByTenantID(ctx context.Context, tenantID string) ([]*entity.Event, error)
 	FindLastEventByFingerprint(ctx context.Context, fingerprint string) (*entity.Event, error)
+	FindAllEventByTrackID(ctx context.Context, trackID bson.ObjectID) ([]*entity.Event, error)
 }
 
 type eventRepo struct {
@@ -34,15 +39,6 @@ func (r *eventRepo) CreateEvent(ctx context.Context, event *entity.Event) error 
 	now := time.Now()
 	event.CreatedAt = now
 	event.UpdatedAt = now
-
-	isTrackIDExist, err := r.trackRepo.IsTrackIDExist(ctx, event.TrackID)
-	if err != nil {
-		return err
-	}
-
-	if !isTrackIDExist {
-		return fmt.Errorf("track id with ID %s does not exist", event.TrackID.Hex())
-	}
 
 	res, err := r.collection.InsertOne(ctx, event)
 	if err != nil {
@@ -97,10 +93,29 @@ func (r *eventRepo) FindLastEventByFingerprint(ctx context.Context, fingerprint 
 	var event entity.Event
 	err := r.collection.FindOne(ctx, filter, opts).Decode(&event)
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return nil, fmt.Errorf("no event with fingerprint id %s", fingerprint)
+		return nil, ErrNoEvents
 	} else if err != nil {
 		return nil, err
 	}
 
 	return &event, nil
+}
+
+func (r *eventRepo) FindAllEventByTrackID(ctx context.Context, trackID bson.ObjectID) ([]*entity.Event, error) {
+	filter := bson.M{"track_id": trackID}
+	opts := options.Find().
+		SetSort(bson.D{{Key: "published_at", Value: -1}})
+	cursor, err := r.collection.Find(ctx, filter, opts)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, ErrNoEvents
+	} else if err != nil {
+		return nil, err
+	}
+
+	var results []*entity.Event
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, fmt.Errorf("failed to decode result: %w", err)
+	}
+
+	return results, nil
 }

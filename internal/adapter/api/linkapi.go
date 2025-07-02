@@ -101,5 +101,15 @@ func (f *linkAPI) Redirect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, link.Url, http.StatusFound)
+	newParams := r.URL.Query()
+	u, _ := url.Parse(link.Url)
+	existingParams := u.Query()
+	for key, values := range newParams {
+		for _, v := range values {
+			existingParams.Add(key, v) // Use .Set() if you want to replace instead
+		}
+	}
+	u.RawQuery = existingParams.Encode()
+
+	http.Redirect(w, r, u.String(), http.StatusFound)
 }
