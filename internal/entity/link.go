@@ -22,6 +22,7 @@ Best Practices
 */
 type Link struct {
 	ID         bson.ObjectID `bson:"_id,omitempty"` // id
+	Name       string        `bson:"name"`          // name
 	TenantID   string        `bson:"tenant_id"`     // tenant id
 	Url        string        `bson:"url"`           // original url
 	ShortID    string        `bson:"short_id"`      // short id

@@ -15,11 +15,6 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-type TrackAPI interface {
-	CreateTrack(w http.ResponseWriter, r *http.Request)
-	TrackEvent(w http.ResponseWriter, r *http.Request)
-}
-
 type trackAPI struct {
 	uc     usecase.UseCase
 	config *core.Config
@@ -121,7 +116,7 @@ func (t *TrackEventRequest) ToString() string {
 
 type TrackEventResponse struct{}
 
-func NewTrackAPI(config *core.Config, uc usecase.UseCase) TrackAPI {
+func NewTrackAPI(config *core.Config, uc usecase.UseCase) *trackAPI {
 	return &trackAPI{config: config, uc: uc}
 }
 

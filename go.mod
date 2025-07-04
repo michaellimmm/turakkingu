@@ -11,6 +11,7 @@ require (
 	github.com/testcontainers/testcontainers-go v0.37.0
 	github.com/testcontainers/testcontainers-go/modules/mongodb v0.37.0
 	go.mongodb.org/mongo-driver/v2 v2.2.2
+	go.uber.org/mock v0.5.2
 	golang.org/x/sync v0.14.0
 )
 

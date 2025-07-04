@@ -24,7 +24,7 @@ func NewApi(config *core.Config, uc usecase.UseCase) API {
 	trackingSettingAPI := NewTrackingSettingAPI(config, uc)
 
 	router := &router{
-		linkApi:            linkApi,
+		linkAPI:            linkApi,
 		trackingAPI:        trackingAPI,
 		trackingSettingAPI: trackingSettingAPI,
 	}
@@ -51,9 +51,9 @@ func (a *api) Close(ctx context.Context) error {
 }
 
 type router struct {
-	linkApi            LinkAPI
-	trackingAPI        TrackAPI
-	trackingSettingAPI TrackingSettingAPI
+	linkAPI            *linkAPI
+	trackingAPI        *trackAPI
+	trackingSettingAPI *trackingSettingAPI
 }
 
 func (r *router) Mux() *http.ServeMux {
@@ -61,8 +61,8 @@ func (r *router) Mux() *http.ServeMux {
 	fs := http.FileServer(http.Dir("static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	mux.HandleFunc("POST /v1/links", r.linkApi.CreateLink)
-	mux.HandleFunc("GET /r/{id}", r.linkApi.Redirect)
+	mux.HandleFunc("POST /v1/links", r.linkAPI.CreateLink)
+	mux.HandleFunc("GET /r/{id}", r.linkAPI.Redirect)
 
 	mux.HandleFunc("GET /v1/tenants/{tenant_id}/tracking-settings", r.trackingSettingAPI.GetTrackingSetting)
 	mux.HandleFunc("POST /v1/tracking-settings/pages", r.trackingSettingAPI.AddThankYouPage)

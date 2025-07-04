@@ -10,7 +10,8 @@ import (
 
 type LinkUseCase interface {
 	CreateLink(context.Context, *entity.Link) error
-	GetFixedLink(context.Context, string) (*entity.Link, error)
+	GetLink(context.Context, string) (*entity.Link, error)
+	GetAllLinks(ctx context.Context, tenantID string) ([]*entity.Link, error)
 }
 
 type linkUseCase struct {
@@ -34,11 +35,21 @@ func (uc *linkUseCase) CreateLink(ctx context.Context, link *entity.Link) error 
 	return nil
 }
 
-func (uc *linkUseCase) GetFixedLink(ctx context.Context, id string) (*entity.Link, error) {
+func (uc *linkUseCase) GetLink(ctx context.Context, id string) (*entity.Link, error) {
 	link, err := uc.repo.FindLinkByShortID(ctx, id)
 	if err != nil {
 		slog.Error("failed to get link", slog.String("error", err.Error()))
 		return nil, err
 	}
 	return link, nil
+}
+
+func (uc *linkUseCase) GetAllLinks(ctx context.Context, tenantID string) ([]*entity.Link, error) {
+	links, err := uc.repo.FindAllLinkbyTenantID(ctx, tenantID)
+	if err != nil {
+		slog.Error("failed to get links", slog.String("error", err.Error()))
+		return nil, err
+	}
+
+	return links, err
 }

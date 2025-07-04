@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
+//go:generate mockgen -source=repo.go -destination=repo_mock.go -package=repository
 type Repo interface {
 	LinkRepo
 	TrackingSettingRepo

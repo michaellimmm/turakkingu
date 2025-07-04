@@ -32,7 +32,7 @@ go run main.go
 - install dependecy
 
 ```bash
-cd example/car-dealer
+cd test/car-dealer
 bun install
 bun dev
 ```
@@ -42,7 +42,7 @@ bun dev
 - install dependecy
 
 ```bash
-cd example/car-form
+cd test/car-form
 bun install
 bun dev
 ```

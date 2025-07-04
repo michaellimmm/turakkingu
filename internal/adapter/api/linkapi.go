@@ -12,19 +12,24 @@ import (
 	"net/url"
 )
 
-type LinkAPI interface {
-	CreateLink(w http.ResponseWriter, r *http.Request)
-	Redirect(w http.ResponseWriter, r *http.Request)
+type linkAPI struct {
+	uc     usecase.UseCase
+	config *core.Config
 }
 
 type CreateLinkRequest struct {
 	TenantID string `json:"tenant_id"`
+	Name     string `json:"name"`
 	Url      string `json:"url"`
 }
 
 func (c *CreateLinkRequest) Validate() error {
 	if c.TenantID == "" {
 		return fmt.Errorf("tenant_id can not be empty")
+	}
+
+	if c.Name == "" {
+		return fmt.Errorf("name can not be empty")
 	}
 
 	if c.Url == "" {
@@ -50,12 +55,7 @@ type CreateLinkResponse struct {
 	Link string `json:"link"`
 }
 
-type linkAPI struct {
-	uc     usecase.UseCase
-	config *core.Config
-}
-
-func NewLinkAPI(config *core.Config, uc usecase.UseCase) LinkAPI {
+func NewLinkAPI(config *core.Config, uc usecase.UseCase) *linkAPI {
 	return &linkAPI{
 		uc:     uc,
 		config: config,
@@ -79,6 +79,7 @@ func (f *linkAPI) CreateLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	link := &entity.Link{
+		Name:     req.Name,
 		Url:      req.Url,
 		TenantID: req.TenantID,
 	}
@@ -94,7 +95,7 @@ func (f *linkAPI) CreateLink(w http.ResponseWriter, r *http.Request) {
 
 func (f *linkAPI) Redirect(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	link, err := f.uc.GetFixedLink(r.Context(), id)
+	link, err := f.uc.GetLink(r.Context(), id)
 	if err != nil {
 		slog.Error("failed to get link", slog.String("error", err.Error()))
 		render404(w)

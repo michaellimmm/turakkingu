@@ -8,11 +8,9 @@ package web
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "strconv"
-
 // ConversionPoint represents a single conversion tracking point
 type ConversionPoint struct {
-	ID     int    `json:"id"`
+	ID     string `json:"id"`
 	Name   string `json:"name"`
 	URL    string `json:"url"`
 	Status string `json:"status"`
@@ -20,21 +18,23 @@ type ConversionPoint struct {
 
 // LandingPage represents a redirect URL and landing page association
 type LandingPage struct {
-	ID              int    `json:"id"`
+	ID              string `json:"id"`
 	FixedURL        string `json:"fixed_url"`
 	LandingPageName string `json:"landing_page_name"`
 	LandingPageURL  string `json:"landing_page_url"`
-	Status          string `json:"status"`
 }
 
-// ConversionTracker handles the main state
+// ConversionTracker handles conversion points data
 type ConversionTracker struct {
 	ConversionPoints []ConversionPoint
-	LandingPages     []LandingPage
-	ActiveTab        string
-	ActiveSubTab     string
 }
 
+// LandingPageTracker handles landing pages data
+type LandingPageTracker struct {
+	LandingPages []LandingPage
+}
+
+// Main index page
 func IndexPage(tracker *ConversionTracker) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -56,39 +56,73 @@ func IndexPage(tracker *ConversionTracker) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Conversion Tracker</title><script src=\"https://unpkg.com/htmx.org@1.9.10\"></script><link href=\"https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css\" rel=\"stylesheet\"><style>\n\t\t\t.tab-active {\n\t\t\t\tborder-bottom: 2px solid #2563eb;\n\t\t\t\tcolor: #2563eb;\n\t\t\t}\n\t\t\t.sub-tab-active {\n\t\t\t\tbackground-color: #f3f4f6;\n\t\t\t\tborder: 1px solid #d1d5db;\n\t\t\t\tborder-bottom: 1px solid #f3f4f6;\n\t\t\t}\n\t\t\t.modal {\n\t\t\t\tdisplay: none;\n\t\t\t}\n\t\t\t.modal.show {\n\t\t\t\tdisplay: flex;\n\t\t\t}\n\t\t</style></head><body class=\"bg-gray-50\"><div class=\"max-w-7xl mx-auto p-6\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = Header().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = TabNavigation(tracker).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = MainContent(tracker).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = AddModal().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = AddLandingPageModal().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = Scripts().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</body></html>")
+		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			templ_7745c5c3_Err = Header().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = TabNavigation(tracker).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = MainContent(tracker).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = AddModal().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = AddLandingPageModal().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = EditLandingPageModal().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = BulkEditLandingPageModal().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			return nil
+		})
+		templ_7745c5c3_Err = Layout().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -113,12 +147,12 @@ func Header() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var2 == nil {
-			templ_7745c5c3_Var2 = templ.NopComponent
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"mb-8\"><h1 class=\"text-3xl font-bold text-gray-900\">Conversion Tracker</h1></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"mb-8\"><h1 class=\"text-3xl font-bold text-gray-900\">Conversion Tracker</h1></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -143,60 +177,12 @@ func TabNavigation(tracker *ConversionTracker) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var3 == nil {
-			templ_7745c5c3_Var3 = templ.NopComponent
+		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var4 == nil {
+			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"border-b border-gray-200 mb-6\"><nav class=\"-mb-px flex space-x-8\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var4 = []any{"py-2 px-1 border-b-2 font-medium text-sm",
-			templ.KV("tab-active", tracker.ActiveTab == "tracking-settings"),
-			templ.KV("border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300", tracker.ActiveTab != "tracking-settings")}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var4...)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<button class=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var4).String())
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 1, Col: 0}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\">Tracking Settings</button> ")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var6 = []any{"py-2 px-1 border-b-2 font-medium text-sm",
-			templ.KV("tab-active", tracker.ActiveTab == "tracking-snippet"),
-			templ.KV("border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300", tracker.ActiveTab != "tracking-snippet")}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<button class=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var6).String())
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 1, Col: 0}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\">Tracking Snippet</button></nav></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"border-b border-gray-200 mb-6\"><nav class=\"-mb-px flex space-x-8\"><button class=\"py-2 px-1 border-b-2 font-medium text-sm tab-active\">Tracking Settings</button> <button class=\"py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm\">Tracking Snippet</button></nav></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -221,12 +207,12 @@ func MainContent(tracker *ConversionTracker) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var8 == nil {
-			templ_7745c5c3_Var8 = templ.NopComponent
+		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var5 == nil {
+			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"bg-white rounded-lg shadow\"><div id=\"main-content-body\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"bg-white rounded-lg shadow\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -234,7 +220,7 @@ func MainContent(tracker *ConversionTracker) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -259,31 +245,24 @@ func MainContentBody(tracker *ConversionTracker) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var9 == nil {
-			templ_7745c5c3_Var9 = templ.NopComponent
+		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var6 == nil {
+			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = SubTabNavigation(tracker).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = SubTabNavigation().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div id=\"tab-content\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div id=\"conversion-content\" class=\"tab-content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if tracker.ActiveSubTab == "conversion-point-url" {
-			templ_7745c5c3_Err = ConversionContent(tracker).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			templ_7745c5c3_Err = LandingPagesContent(tracker).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		templ_7745c5c3_Err = ConversionContent(tracker).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div><div id=\"landing-pages-content\" class=\"tab-content\" style=\"display: none;\"><div class=\"p-6\"><div class=\"text-center text-gray-500\">Loading landing pages...</div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -292,7 +271,7 @@ func MainContentBody(tracker *ConversionTracker) templ.Component {
 }
 
 // Sub-tab navigation
-func SubTabNavigation(tracker *ConversionTracker) templ.Component {
+func SubTabNavigation() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -308,60 +287,12 @@ func SubTabNavigation(tracker *ConversionTracker) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var10 == nil {
-			templ_7745c5c3_Var10 = templ.NopComponent
+		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var7 == nil {
+			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"border-b border-gray-200\"><nav class=\"flex space-x-0\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var11 = []any{"py-3 px-4 text-sm font-medium border-r border-gray-200",
-			templ.KV("sub-tab-active", tracker.ActiveSubTab == "conversion-point-url"),
-			templ.KV("text-gray-500 hover:text-gray-700", tracker.ActiveSubTab != "conversion-point-url")}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<button class=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var12 string
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var11).String())
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 1, Col: 0}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-get=\"/tab/conversion-point-url\" hx-target=\"#main-content-body\" hx-swap=\"innerHTML\">Conversion Point URL</button> ")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var13 = []any{"py-3 px-4 text-sm font-medium",
-			templ.KV("sub-tab-active", tracker.ActiveSubTab == "redirect-url"),
-			templ.KV("text-gray-500 hover:text-gray-700", tracker.ActiveSubTab != "redirect-url")}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var13...)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<button class=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var13).String())
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 1, Col: 0}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" hx-get=\"/tab/redirect-url\" hx-target=\"#main-content-body\" hx-swap=\"innerHTML\">Redirect URL & Landing Pages</button></nav></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"border-b border-gray-200\"><nav class=\"flex space-x-0\"><button id=\"conversion-tab\" class=\"py-3 px-4 text-sm font-medium border-r border-gray-200 sub-tab-active\" onclick=\"switchTab('conversion')\">Conversion Point URL</button> <button id=\"landing-pages-tab\" class=\"py-3 px-4 text-sm font-medium text-gray-500 hover:text-gray-700\" onclick=\"switchTab('landing-pages')\">Redirect URL & Landing Pages</button></nav></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -386,12 +317,12 @@ func ConversionContent(tracker *ConversionTracker) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var15 == nil {
-			templ_7745c5c3_Var15 = templ.NopComponent
+		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var8 == nil {
+			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"p-6\"><p class=\"text-sm text-gray-600 mb-6\">Enter the URL of the pages you want to set as Conversion Points (for example Thank you page)</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"p-6\"><p class=\"text-sm text-gray-600 mb-6\">Enter the URL of the pages you want to set as Conversion Points (for example Thank you page)</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -399,7 +330,7 @@ func ConversionContent(tracker *ConversionTracker) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div id=\"conversion-table\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div id=\"conversion-table\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -407,7 +338,7 @@ func ConversionContent(tracker *ConversionTracker) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -416,7 +347,7 @@ func ConversionContent(tracker *ConversionTracker) templ.Component {
 }
 
 // Landing Pages content
-func LandingPagesContent(tracker *ConversionTracker) templ.Component {
+func LandingPagesContent(pages []LandingPage) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -432,12 +363,12 @@ func LandingPagesContent(tracker *ConversionTracker) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var16 == nil {
-			templ_7745c5c3_Var16 = templ.NopComponent
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"p-6\"><p class=\"text-sm text-gray-600 mb-6\">Generate a Redirect URL and associate a Landing page to it. The Redirect URL can be used inside scenarios.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"p-6\"><p class=\"text-sm text-gray-600 mb-6\">Generate a Redirect URL and associate a Landing page to it. The Redirect URL can be used inside scenarios.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -445,15 +376,15 @@ func LandingPagesContent(tracker *ConversionTracker) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<div id=\"landing-pages-table\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div id=\"landing-pages-table\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = LandingPagesTable(tracker.LandingPages).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = LandingPagesTable(pages).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -478,12 +409,12 @@ func ConversionSearchAndControls() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var17 == nil {
-			templ_7745c5c3_Var17 = templ.NopComponent
+		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var10 == nil {
+			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div class=\"flex items-center justify-between mb-6\"><div class=\"flex items-center space-x-4\"><div class=\"relative\"><input type=\"text\" placeholder=\"Search by Name or URL\" class=\"w-80 pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500\" hx-post=\"/search\" hx-target=\"#conversion-table\" hx-swap=\"innerHTML\" hx-trigger=\"keyup changed delay:300ms\" name=\"search\"><div class=\"absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none\"><svg class=\"h-5 w-5 text-gray-400\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\"></path></svg></div></div><select class=\"border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" hx-post=\"/filter\" hx-target=\"#conversion-table\" hx-swap=\"innerHTML\" name=\"status\"><option value=\"\">Status</option> <option value=\"all\">All</option> <option value=\"Draft\">Draft</option> <option value=\"Active\">Active</option></select> <button class=\"inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\" onclick=\"showAddModal()\"><svg class=\"h-4 w-4 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 6v6m0 0v6m0-6h6m-6 0H6\"></path></svg> Add</button> <button class=\"inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\"><svg class=\"h-4 w-4 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z\"></path></svg> Edit</button></div><button class=\"inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\" hx-post=\"/start-tracking\" hx-target=\"#conversion-table\" hx-swap=\"innerHTML\" hx-include=\"[name='selected']\">Start Tracking Selected</button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"flex items-center justify-between mb-6\"><div class=\"flex items-center space-x-4\"><div class=\"relative\"><input type=\"text\" placeholder=\"Search by Name or URL\" class=\"w-80 pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500\" hx-post=\"/search\" hx-target=\"#conversion-table\" hx-swap=\"innerHTML\" hx-trigger=\"keyup changed delay:300ms\" name=\"search\"><div class=\"absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none\"><svg class=\"h-5 w-5 text-gray-400\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\"></path></svg></div></div><select class=\"border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" hx-post=\"/filter\" hx-target=\"#conversion-table\" hx-swap=\"innerHTML\" name=\"status\"><option value=\"\">Status</option> <option value=\"all\">All</option> <option value=\"Draft\">Draft</option> <option value=\"Active\">Active</option></select> <button class=\"inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\" onclick=\"showAddModal()\"><svg class=\"h-4 w-4 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 6v6m0 0v6m0-6h6m-6 0H6\"></path></svg> Add</button> <button class=\"inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\"><svg class=\"h-4 w-4 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z\"></path></svg> Edit</button></div><button class=\"inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\" hx-post=\"/start-tracking\" hx-target=\"#conversion-table\" hx-swap=\"innerHTML\" hx-include=\"[name='selected']\">Start Tracking Selected</button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -508,12 +439,12 @@ func LandingPagesSearchAndControls() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var18 == nil {
-			templ_7745c5c3_Var18 = templ.NopComponent
+		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var11 == nil {
+			templ_7745c5c3_Var11 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"flex items-center justify-between mb-6\"><div class=\"flex items-center space-x-4\"><div class=\"relative\"><input type=\"text\" placeholder=\"Search by Name or URL\" class=\"w-80 pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500\" hx-post=\"/landing-pages/search\" hx-target=\"#landing-pages-table\" hx-swap=\"innerHTML\" hx-trigger=\"keyup changed delay:300ms\" name=\"search\"><div class=\"absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none\"><svg class=\"h-5 w-5 text-gray-400\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\"></path></svg></div></div><select class=\"border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" hx-post=\"/landing-pages/filter\" hx-target=\"#landing-pages-table\" hx-swap=\"innerHTML\" name=\"status\"><option value=\"\">Status</option> <option value=\"all\">All</option> <option value=\"Draft\">Draft</option> <option value=\"Active\">Active</option></select> <button class=\"inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\" onclick=\"showLandingPageModal()\"><svg class=\"h-4 w-4 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 6v6m0 0v6m0-6h6m-6 0H6\"></path></svg> Add</button> <button class=\"inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\"><svg class=\"h-4 w-4 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z\"></path></svg> Edit</button></div><button class=\"inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\" hx-post=\"/landing-pages/start-tracking\" hx-target=\"#landing-pages-table\" hx-swap=\"innerHTML\" hx-include=\"[name='selected']\">Start Tracking All</button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div class=\"flex items-center justify-between mb-6\"><div class=\"flex items-center space-x-4\"><div class=\"relative\"><input type=\"text\" placeholder=\"Search by Name or URL\" class=\"w-80 pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500\" hx-post=\"/landing-pages/search\" hx-target=\"#landing-pages-table\" hx-swap=\"innerHTML\" hx-trigger=\"keyup changed delay:300ms\" name=\"search\"><div class=\"absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none\"><svg class=\"h-5 w-5 text-gray-400\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\"></path></svg></div></div><button class=\"inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\" onclick=\"showLandingPageModal()\"><svg class=\"h-4 w-4 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 6v6m0 0v6m0-6h6m-6 0H6\"></path></svg> Add</button> <button class=\"inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\"><svg class=\"h-4 w-4 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z\"></path></svg> Edit</button></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -538,12 +469,12 @@ func ConversionPointsTable(points []ConversionPoint) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var12 == nil {
+			templ_7745c5c3_Var12 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<div class=\"overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg\"><table class=\"min-w-full divide-y divide-gray-300\"><thead class=\"bg-gray-50\"><tr><th scope=\"col\" class=\"relative w-12 px-6 sm:w-16 sm:px-8\"><input type=\"checkbox\" class=\"absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500\" onchange=\"toggleAllCheckboxes(this)\"></th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Name</th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Conversion Point URL</th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Status</th></tr></thead> <tbody class=\"bg-white divide-y divide-gray-200\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg\"><table class=\"min-w-full divide-y divide-gray-300\"><thead class=\"bg-gray-50\"><tr><th scope=\"col\" class=\"relative w-12 px-6 sm:w-16 sm:px-8\"><input type=\"checkbox\" class=\"absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500\" onchange=\"toggleAllCheckboxes(this)\"></th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Name</th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Conversion Point URL</th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Status</th></tr></thead> <tbody class=\"bg-white divide-y divide-gray-200\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -553,7 +484,7 @@ func ConversionPointsTable(points []ConversionPoint) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</tbody></table></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</tbody></table></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -578,106 +509,106 @@ func ConversionPointRow(point ConversionPoint, isEven bool) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var20 == nil {
-			templ_7745c5c3_Var20 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var21 = []any{templ.KV("bg-white", isEven), templ.KV("bg-gray-50", !isEven)}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var21...)
+		var templ_7745c5c3_Var14 = []any{templ.KV("bg-white", isEven), templ.KV("bg-gray-50", !isEven)}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<tr class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<tr class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 string
-		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var21).String())
+		var templ_7745c5c3_Var15 string
+		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var14).String())
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 1, Col: 0}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\"><td class=\"relative w-12 px-6 sm:w-16 sm:px-8\"><input type=\"checkbox\" name=\"selected\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\"><td class=\"relative w-12 px-6 sm:w-16 sm:px-8\"><input type=\"checkbox\" name=\"selected\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(point.ID))
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(point.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 348, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 274, Col: 20}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" class=\"absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500\"></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-900\"><div class=\"max-w-xs truncate\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var24 string
-		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(point.Name)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 354, Col: 16}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" class=\"absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500\"></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-900\"><div class=\"max-w-xs truncate\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</div></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-500\"><div class=\"max-w-md truncate\">")
+		var templ_7745c5c3_Var17 string
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(point.Name)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 280, Col: 16}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var25 string
-		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(point.URL)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 359, Col: 15}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</div></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-500\"><div class=\"max-w-md truncate\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div></td><td class=\"px-6 py-4 whitespace-nowrap\">")
+		var templ_7745c5c3_Var18 string
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(point.URL)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 285, Col: 15}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var26 = []any{"inline-flex px-2 py-1 text-xs font-semibold rounded-full",
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</div></td><td class=\"px-6 py-4 whitespace-nowrap\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var19 = []any{"inline-flex px-2 py-1 text-xs font-semibold rounded-full",
 			templ.KV("bg-yellow-100 text-yellow-800", point.Status == "Draft"),
 			templ.KV("bg-green-100 text-green-800", point.Status == "Active")}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var26...)
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var19...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<span class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<span class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var27 string
-		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var26).String())
+		var templ_7745c5c3_Var20 string
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var19).String())
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 1, Col: 0}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var28 string
-		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(point.Status)
+		var templ_7745c5c3_Var21 string
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(point.Status)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 366, Col: 18}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 294, Col: 18}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</span></td></tr>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</span></td></tr>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -702,12 +633,12 @@ func LandingPagesTable(pages []LandingPage) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var29 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var29 == nil {
-			templ_7745c5c3_Var29 = templ.NopComponent
+		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var22 == nil {
+			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<div class=\"overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg\"><table class=\"min-w-full divide-y divide-gray-300\"><thead class=\"bg-gray-50\"><tr><th scope=\"col\" class=\"relative w-12 px-6 sm:w-16 sm:px-8\"><input type=\"checkbox\" class=\"absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500\" onchange=\"toggleAllCheckboxes(this)\"></th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Fixed URL</th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Landing Page Name</th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Landing Page URL</th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Status</th></tr></thead> <tbody class=\"bg-white divide-y divide-gray-200\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg\"><table class=\"min-w-full divide-y divide-gray-300\"><thead class=\"bg-gray-50\"><tr><th scope=\"col\" class=\"relative w-12 px-6 sm:w-16 sm:px-8\"><input type=\"checkbox\" class=\"absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500\" onchange=\"toggleAllCheckboxes(this)\"></th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Fixed URL</th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Landing Page Name</th><th scope=\"col\" class=\"px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider\">Landing Page URL</th></tr></thead> <tbody class=\"bg-white divide-y divide-gray-200\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -717,7 +648,7 @@ func LandingPagesTable(pages []LandingPage) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</tbody></table></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</tbody></table></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -742,119 +673,82 @@ func LandingPageRow(page LandingPage, isEven bool) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var30 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var30 == nil {
-			templ_7745c5c3_Var30 = templ.NopComponent
+		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var23 == nil {
+			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var31 = []any{templ.KV("bg-white", isEven), templ.KV("bg-gray-50", !isEven)}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var31...)
+		var templ_7745c5c3_Var24 = []any{templ.KV("bg-white", isEven), templ.KV("bg-gray-50", !isEven)}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var24...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<tr class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<tr class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var32 string
-		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var31).String())
+		var templ_7745c5c3_Var25 string
+		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var24).String())
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 1, Col: 0}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\"><td class=\"relative w-12 px-6 sm:w-16 sm:px-8\"><input type=\"checkbox\" name=\"selected\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\"><td class=\"relative w-12 px-6 sm:w-16 sm:px-8\"><input type=\"checkbox\" name=\"selected\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var33 string
-		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(page.ID))
+		var templ_7745c5c3_Var26 string
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(page.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 411, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 336, Col: 19}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" class=\"absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500\"></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-900\"><div class=\"max-w-xs truncate\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var34 string
-		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(page.FixedURL)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 417, Col: 19}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\" class=\"absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500\" onchange=\"checkForBulkEdit()\"></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-900\"><div class=\"max-w-xs truncate\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-900\"><div class=\"max-w-xs truncate\">")
+		var templ_7745c5c3_Var27 string
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(page.FixedURL)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 343, Col: 19}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var35 string
-		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(page.LandingPageName)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 422, Col: 26}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</div></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-900\"><div class=\"max-w-xs truncate\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</div></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-500\"><div class=\"max-w-md truncate\">")
+		var templ_7745c5c3_Var28 string
+		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(page.LandingPageName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 348, Col: 26}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var36 string
-		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(page.LandingPageURL)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 427, Col: 25}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</div></td><td class=\"px-6 py-4 whitespace-nowrap text-sm text-gray-500\"><div class=\"max-w-md truncate\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</div></td><td class=\"px-6 py-4 whitespace-nowrap\">")
+		var templ_7745c5c3_Var29 string
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(page.LandingPageURL)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 353, Col: 25}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var37 = []any{"inline-flex px-2 py-1 text-xs font-semibold rounded-full",
-			templ.KV("bg-yellow-100 text-yellow-800", page.Status == "Draft"),
-			templ.KV("bg-green-100 text-green-800", page.Status == "Active")}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var37...)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<span class=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var38 string
-		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var37).String())
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 1, Col: 0}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var39 string
-		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(page.Status)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/index.templ`, Line: 434, Col: 17}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</span></td></tr>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</div></td></tr>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -879,12 +773,12 @@ func AddModal() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var40 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var40 == nil {
-			templ_7745c5c3_Var40 = templ.NopComponent
+		templ_7745c5c3_Var30 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var30 == nil {
+			templ_7745c5c3_Var30 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<div id=\"addModal\" class=\"modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center\"><div class=\"relative p-5 border w-96 shadow-lg rounded-md bg-white\"><div class=\"mt-3\"><h3 class=\"text-lg font-medium text-gray-900 mb-4\">Add Conversion Point</h3><form hx-post=\"/add\" hx-target=\"#conversion-table\" hx-swap=\"innerHTML\" onsubmit=\"hideAddModal()\"><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\">Name</label> <input type=\"text\" name=\"name\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\">URL</label> <input type=\"url\" name=\"url\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div class=\"flex items-center justify-end space-x-3\"><button type=\"button\" onclick=\"hideAddModal()\" class=\"px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700\">Add</button></div></form></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<div id=\"addModal\" class=\"modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center\"><div class=\"relative p-5 border w-96 shadow-lg rounded-md bg-white\"><div class=\"mt-3\"><h3 class=\"text-lg font-medium text-gray-900 mb-4\">Add Conversion Point</h3><form hx-post=\"/add\" hx-target=\"#conversion-table\" hx-swap=\"innerHTML\" onsubmit=\"hideAddModal()\"><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\">Name</label> <input type=\"text\" name=\"name\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\">URL</label> <input type=\"url\" name=\"url\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div class=\"flex items-center justify-end space-x-3\"><button type=\"button\" onclick=\"hideAddModal()\" class=\"px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700\">Add</button></div></form></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -909,12 +803,72 @@ func AddLandingPageModal() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var41 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var41 == nil {
-			templ_7745c5c3_Var41 = templ.NopComponent
+		templ_7745c5c3_Var31 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var31 == nil {
+			templ_7745c5c3_Var31 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<div id=\"addLandingPageModal\" class=\"modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center\"><div class=\"relative p-5 border w-96 shadow-lg rounded-md bg-white\"><div class=\"mt-3\"><h3 class=\"text-lg font-medium text-gray-900 mb-4\">Add Landing Page</h3><form hx-post=\"/landing-pages/add\" hx-target=\"#landing-pages-table\" hx-swap=\"innerHTML\" onsubmit=\"hideLandingPageModal()\"><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\">Fixed URL</label> <input type=\"url\" name=\"fixed_url\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\">Landing Page Name</label> <input type=\"text\" name=\"landing_page_name\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\">Landing Page URL</label> <input type=\"url\" name=\"landing_page_url\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div class=\"flex items-center justify-end space-x-3\"><button type=\"button\" onclick=\"hideLandingPageModal()\" class=\"px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700\">Add</button></div></form></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<div id=\"addLandingPageModal\" class=\"modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center\"><div class=\"relative p-5 border w-96 shadow-lg rounded-md bg-white\"><div class=\"mt-3\"><h3 class=\"text-lg font-medium text-gray-900 mb-4\">Add Landing Page</h3><form hx-post=\"/landing-pages/add\" hx-target=\"#landing-pages-table\" hx-swap=\"innerHTML\" onsubmit=\"hideLandingPageModal()\"><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\">Landing Page Name</label> <input type=\"text\" name=\"landing_page_name\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\">Landing Page URL</label> <input type=\"url\" name=\"landing_page_url\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div class=\"flex items-center justify-end space-x-3\"><button type=\"button\" onclick=\"hideLandingPageModal()\" class=\"px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700\">Add</button></div></form></div></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// Edit landing page modal
+func EditLandingPageModal() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var32 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var32 == nil {
+			templ_7745c5c3_Var32 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<div id=\"editLandingPageModal\" class=\"modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center\"><div class=\"relative p-5 border w-96 shadow-lg rounded-md bg-white\"><div class=\"mt-3\"><h3 class=\"text-lg font-medium text-gray-900 mb-4\">Edit Landing Page</h3><form id=\"editLandingPageForm\" hx-target=\"#landing-pages-table\" hx-swap=\"innerHTML\" onsubmit=\"hideEditLandingPageModal()\"><input type=\"hidden\" id=\"editLandingPageId\" name=\"id\"><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\">Landing Page Name</label> <input type=\"text\" id=\"editLandingPageName\" name=\"landing_page_name\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" placeholder=\"Enter landing page name\" required></div><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\">Landing Page URL</label> <input type=\"text\" id=\"editLandingPageUrl\" name=\"landing_page_url\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" placeholder=\"Enter landing page URL\" required></div><div class=\"flex items-center justify-end space-x-3\"><button type=\"button\" onclick=\"hideEditLandingPageModal()\" class=\"px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700\">Save Changes</button></div></form></div></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// Bulk edit landing pages modal
+func BulkEditLandingPageModal() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var33 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var33 == nil {
+			templ_7745c5c3_Var33 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div id=\"bulkEditLandingPageModal\" class=\"modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center\"><div class=\"relative p-5 border w-96 shadow-lg rounded-md bg-white\"><div class=\"mt-3\"><h3 class=\"text-lg font-medium text-gray-900 mb-4\">Edit Multiple Landing Pages</h3><p class=\"text-sm text-gray-600 mb-4\">Changes will be applied to <span id=\"selectedCount\">0</span> selected items.</p><form id=\"bulkEditLandingPageForm\" hx-target=\"#landing-pages-table\" hx-swap=\"innerHTML\" hx-include=\"[name='selected']\" onsubmit=\"return submitBulkEdit()\"><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\"><input type=\"checkbox\" id=\"bulkEditFixedUrl\" class=\"mr-2\"> Update Fixed URL</label> <input type=\"text\" id=\"bulkFixedUrl\" name=\"fixed_url\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" placeholder=\"Enter fixed URL\" disabled></div><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\"><input type=\"checkbox\" id=\"bulkEditLandingPageName\" class=\"mr-2\"> Update Landing Page Name</label> <input type=\"text\" id=\"bulkLandingPageName\" name=\"landing_page_name\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" placeholder=\"Enter landing page name\" disabled></div><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\"><input type=\"checkbox\" id=\"bulkEditLandingPageUrl\" class=\"mr-2\"> Update Landing Page URL</label> <input type=\"text\" id=\"bulkLandingPageUrl\" name=\"landing_page_url\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" placeholder=\"Enter landing page URL\" disabled></div><div class=\"mb-4\"><label class=\"block text-sm font-medium text-gray-700 mb-2\"><input type=\"checkbox\" id=\"bulkEditStatus\" class=\"mr-2\"> Update Status</label> <select id=\"bulkStatus\" name=\"status\" class=\"w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500\" disabled><option value=\"Draft\">Draft</option> <option value=\"Active\">Active</option></select></div><div class=\"flex items-center justify-end space-x-3\"><button type=\"button\" onclick=\"hideBulkEditLandingPageModal()\" class=\"px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50\">Cancel</button> <button type=\"submit\" class=\"px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700\">Update Selected</button></div></form></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -939,12 +893,12 @@ func Scripts() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var42 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var42 == nil {
-			templ_7745c5c3_Var42 = templ.NopComponent
+		templ_7745c5c3_Var34 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var34 == nil {
+			templ_7745c5c3_Var34 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<script>\n\t\tfunction showAddModal() {\n\t\t\tdocument.getElementById('addModal').classList.add('show');\n\t\t}\n\n\t\tfunction hideAddModal() {\n\t\t\tdocument.getElementById('addModal').classList.remove('show');\n\t\t}\n\n\t\tfunction showLandingPageModal() {\n\t\t\tdocument.getElementById('addLandingPageModal').classList.add('show');\n\t\t}\n\n\t\tfunction hideLandingPageModal() {\n\t\t\tdocument.getElementById('addLandingPageModal').classList.remove('show');\n\t\t}\n\n\t\tfunction toggleAllCheckboxes(source) {\n\t\t\tconst checkboxes = document.querySelectorAll('input[name=\"selected\"]');\n\t\t\tcheckboxes.forEach(checkbox => {\n\t\t\t\tcheckbox.checked = source.checked;\n\t\t\t});\n\t\t}\n\n\t\t// Close modals when clicking outside\n\t\tdocument.getElementById('addModal').addEventListener('click', function(e) {\n\t\t\tif (e.target === this) {\n\t\t\t\thideAddModal();\n\t\t\t}\n\t\t});\n\n\t\tdocument.getElementById('addLandingPageModal').addEventListener('click', function(e) {\n\t\t\tif (e.target === this) {\n\t\t\t\thideLandingPageModal();\n\t\t\t}\n\t\t});\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<script>\n\t\tfunction showAddModal() {\n\t\t\tdocument.getElementById('addModal').classList.add('show');\n\t\t}\n\n\t\tfunction hideAddModal() {\n\t\t\tdocument.getElementById('addModal').classList.remove('show');\n\t\t}\n\n\t\tfunction showLandingPageModal() {\n\t\t\tdocument.getElementById('addLandingPageModal').classList.add('show');\n\t\t}\n\n\t\tfunction hideLandingPageModal() {\n\t\t\tdocument.getElementById('addLandingPageModal').classList.remove('show');\n\t\t}\n\n\t\tfunction showBulkEditLandingPageModal() {\n\t\t\tconst selected = getSelectedLandingPages();\n\t\t\tdocument.getElementById('selectedCount').textContent = selected.length;\n\t\t\tdocument.getElementById('bulkEditLandingPageModal').classList.add('show');\n\t\t}\n\n\t\tfunction hideBulkEditLandingPageModal() {\n\t\t\tdocument.getElementById('bulkEditLandingPageModal').classList.remove('show');\n\t\t\t// Reset form\n\t\t\tconst checkboxes = ['bulkEditFixedUrl', 'bulkEditLandingPageName', 'bulkEditLandingPageUrl', 'bulkEditStatus'];\n\t\t\tcheckboxes.forEach(id => {\n\t\t\t\tdocument.getElementById(id).checked = false;\n\t\t\t\ttoggleBulkField(id);\n\t\t\t});\n\t\t}\n\n\t\tfunction checkForBulkEdit() {\n\t\t\t// const selected = getSelectedLandingPages();\n\t\t\t// // Show bulk edit dialog if more than one item is selected\n\t\t\t// if (selected.length > 1) {\n\t\t\t// \tsetTimeout(() => showBulkEditLandingPageModal(), 100);\n\t\t\t// }\n\t\t}\n\n\t\tfunction getSelectedLandingPages() {\n\t\t\tconst checkboxes = document.querySelectorAll('input[name=\"selected\"]:checked');\n\t\t\treturn Array.from(checkboxes).map(cb => cb.value);\n\t\t}\n\n\t\tfunction toggleBulkField(checkboxId) {\n\t\t\tconst checkbox = document.getElementById(checkboxId);\n\t\t\tconst fieldId = checkboxId.replace('bulkEdit', 'bulk');\n\t\t\tconst field = document.getElementById(fieldId);\n\t\t\t\n\t\t\tif (field) {\n\t\t\t\tfield.disabled = !checkbox.checked;\n\t\t\t\tif (!checkbox.checked) {\n\t\t\t\t\tfield.value = '';\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tfunction submitBulkEdit() {\n\t\t\t// Set the form action and add hidden fields for checkbox states\n\t\t\tconst form = document.getElementById('bulkEditLandingPageForm');\n\t\t\tform.setAttribute('hx-post', '/landing-pages/bulk-edit');\n\t\t\t\n\t\t\t// Remove existing hidden fields\n\t\t\tconst existingHidden = form.querySelectorAll('input[type=\"hidden\"][name^=\"update_\"]');\n\t\t\texistingHidden.forEach(input => input.remove());\n\t\t\t\n\t\t\t// Add hidden fields for checkbox states\n\t\t\tconst checkboxes = ['bulkEditFixedUrl', 'bulkEditLandingPageName', 'bulkEditLandingPageUrl', 'bulkEditStatus'];\n\t\t\tcheckboxes.forEach(id => {\n\t\t\t\tconst checkbox = document.getElementById(id);\n\t\t\t\tif (checkbox && checkbox.checked) {\n\t\t\t\t\tconst hiddenField = document.createElement('input');\n\t\t\t\t\thiddenField.type = 'hidden';\n\t\t\t\t\thiddenField.name = 'update_' + id.replace('bulkEdit', '').toLowerCase().replace(/([A-Z])/g, '_$1').toLowerCase();\n\t\t\t\t\thiddenField.value = 'on';\n\t\t\t\t\tform.appendChild(hiddenField);\n\t\t\t\t}\n\t\t\t});\n\t\t\t\n\t\t\thideBulkEditLandingPageModal();\n\t\t\treturn true;\n\t\t}\n\n\t\t// Simple client-side tab switching with lazy loading\n\t\tfunction switchTab(tabName) {\n\t\t\t// Hide all tab contents\n\t\t\tconst tabContents = document.querySelectorAll('.tab-content');\n\t\t\ttabContents.forEach(content => content.style.display = 'none');\n\t\t\t\n\t\t\t// Remove active class from all tabs\n\t\t\tconst tabs = document.querySelectorAll('#conversion-tab, #landing-pages-tab');\n\t\t\ttabs.forEach(tab => {\n\t\t\t\ttab.classList.remove('sub-tab-active');\n\t\t\t\ttab.classList.add('text-gray-500', 'hover:text-gray-700');\n\t\t\t});\n\t\t\t\n\t\t\t// Show selected tab content\n\t\t\tconst targetContent = document.getElementById(tabName + '-content');\n\t\t\ttargetContent.style.display = 'block';\n\t\t\t\n\t\t\t// Activate selected tab\n\t\t\tconst activeTab = document.getElementById(tabName + '-tab');\n\t\t\tactiveTab.classList.add('sub-tab-active');\n\t\t\tactiveTab.classList.remove('text-gray-500', 'hover:text-gray-700');\n\t\t\t\n\t\t\t// Lazy load landing pages data when first accessed\n\t\t\tif (tabName === 'landing-pages') {\n\t\t\t\tconst landingPagesContent = targetContent.innerHTML;\n\t\t\t\tif (landingPagesContent.includes('Loading landing pages...')) {\n\t\t\t\t\tconsole.log('Loading landing pages data...');\n\t\t\t\t\t// Use HTMX to load the landing pages content\n\t\t\t\t\thtmx.ajax('GET', '/landing-pages', {\n\t\t\t\t\t\ttarget: '#landing-pages-content',\n\t\t\t\t\t\tswap: 'innerHTML'\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tfunction showEditLandingPageModal(id, landingPageName, landingPageUrl) {\n\t\t\tconsole.log('Opening edit modal with data:', {id, landingPageName, landingPageUrl});\n\t\t\t\n\t\t\tdocument.getElementById('editLandingPageId').value = id;\n\t\t\tdocument.getElementById('editLandingPageName').value = landingPageName;\n\t\t\tdocument.getElementById('editLandingPageUrl').value = landingPageUrl;\n\t\t\t\t\t\t\n\t\t\t// Set the form action\n\t\t\tdocument.getElementById('editLandingPageForm').setAttribute('hx-post', '/landing-pages/edit/' + id);\n\t\t\t\n\t\t\tdocument.getElementById('editLandingPageModal').classList.add('show');\n\t\t\t\n\t\t\t// Focus on the first field to test editability\n\t\t\tsetTimeout(() => {\n\t\t\t\tdocument.getElementById('editLandingPageName').focus();\n\t\t\t\tconsole.log('Fixed URL field focused');\n\t\t\t}, 100);\n\t\t}\n\n\t\tfunction hideEditLandingPageModal() {\n\t\t\tdocument.getElementById('editLandingPageModal').classList.remove('show');\n\t\t}\n\n\t\t// Event delegation for edit buttons\n\t\tdocument.addEventListener('click', function(e) {\n\t\t\tif (e.target.classList.contains('edit-landing-page-btn')) {\n\t\t\t\tconsole.log('Edit button clicked!'); // Debug log\n\t\t\t\tconst id = e.target.getAttribute('data-id');\n\t\t\t\tconst fixedUrl = e.target.getAttribute('data-fixed-url');\n\t\t\t\tconst landingPageName = e.target.getAttribute('data-landing-page-name');\n\t\t\t\tconst landingPageUrl = e.target.getAttribute('data-landing-page-url');\n\t\t\t\tconst status = e.target.getAttribute('data-status');\n\t\t\t\t\n\t\t\t\tconsole.log('Data:', {id, landingPageName, landingPageUrl}); // Debug log\n\t\t\t\t\n\t\t\t\tshowEditLandingPageModal(id, landingPageName, landingPageUrl);\n\t\t\t}\n\t\t});\n\n\n\t\t// Initialize HTMX for dynamically loaded content\n\t\tdocument.addEventListener('htmx:afterSwap', function(event) {\n\t\t\t// Re-process any new content for HTMX\n\t\t\thtmx.process(event.detail.target);\n\t\t});\n\n\t\t// Initialize bulk edit field toggles\n\t\tdocument.addEventListener('DOMContentLoaded', function() {\n\t\t\tconst bulkCheckboxes = ['bulkEditFixedUrl', 'bulkEditLandingPageName', 'bulkEditLandingPageUrl', 'bulkEditStatus'];\n\t\t\tbulkCheckboxes.forEach(id => {\n\t\t\t\tconst checkbox = document.getElementById(id);\n\t\t\t\tif (checkbox) {\n\t\t\t\t\tcheckbox.addEventListener('change', () => toggleBulkField(id));\n\t\t\t\t}\n\t\t\t});\n\t\t});\n\n\t\tfunction toggleAllCheckboxes(source) {\n\t\t\tconst checkboxes = document.querySelectorAll('input[name=\"selected\"]');\n\t\t\tcheckboxes.forEach(checkbox => {\n\t\t\t\tcheckbox.checked = source.checked;\n\t\t\t});\n\t\t\t\n\t\t\t// Check for bulk edit after toggling all\n\t\t\tif (source.checked) {\n\t\t\t\tcheckForBulkEdit();\n\t\t\t}\n\t\t}\n\n\t\t// Close modals when clicking outside\n\t\tdocument.getElementById('addModal').addEventListener('click', function(e) {\n\t\t\tif (e.target === this) {\n\t\t\t\thideAddModal();\n\t\t\t}\n\t\t});\n\n\t\tdocument.getElementById('addLandingPageModal').addEventListener('click', function(e) {\n\t\t\tif (e.target === this) {\n\t\t\t\thideLandingPageModal();\n\t\t\t}\n\t\t});\n\n\t\tdocument.getElementById('editLandingPageModal').addEventListener('click', function(e) {\n\t\t\tif (e.target === this) {\n\t\t\t\thideEditLandingPageModal();\n\t\t\t}\n\t\t});\n\n\t\tdocument.getElementById('bulkEditLandingPageModal').addEventListener('click', function(e) {\n\t\t\tif (e.target === this) {\n\t\t\t\thideBulkEditLandingPageModal();\n\t\t\t}\n\t\t});\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

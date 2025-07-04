@@ -153,3 +153,32 @@ func TestLinkRepo_FindByShortID(t *testing.T) {
 		assert.Nil(t, link)
 	})
 }
+
+func TestLinkRepo_FindAllLinkbyTenantID(t *testing.T) {
+	suite, err := setupTestSuiteLinkRepo()
+	assert.NoError(t, err)
+	defer suite.Cleanup()
+
+	ctx := context.Background()
+	t.Run("should find existing link", func(t *testing.T) {
+		link := &entity.Link{
+			TenantID: "tenant1",
+			Name:     "github",
+			Url:      "http://example.com",
+		}
+		err := suite.repo.CreateLink(ctx, link)
+		assert.NoError(t, err)
+		link2 := &entity.Link{
+			TenantID: "tenant1",
+			Name:     "github",
+			Url:      "http://example1.com",
+		}
+		err = suite.repo.CreateLink(ctx, link2)
+		assert.NoError(t, err)
+
+		foundLink, err := suite.repo.FindAllLinkbyTenantID(ctx, "tenant1")
+
+		assert.NoError(t, err)
+		assert.Equal(t, len(foundLink), 2)
+	})
+}

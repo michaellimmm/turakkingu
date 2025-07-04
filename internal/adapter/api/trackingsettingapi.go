@@ -14,11 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-type TrackingSettingAPI interface {
-	GetTrackingSetting(w http.ResponseWriter, r *http.Request)
-	AddThankYouPage(w http.ResponseWriter, r *http.Request)
-}
-
 type trackingSettingAPI struct {
 	uc     usecase.UseCase
 	config *core.Config
@@ -63,7 +58,7 @@ func (r *AddThankYouPageRequest) FromReader(rc io.ReadCloser) error {
 	return json.NewDecoder(rc).Decode(r)
 }
 
-func NewTrackingSettingAPI(config *core.Config, uc usecase.UseCase) TrackingSettingAPI {
+func NewTrackingSettingAPI(config *core.Config, uc usecase.UseCase) *trackingSettingAPI {
 	return &trackingSettingAPI{config: config, uc: uc}
 }
 

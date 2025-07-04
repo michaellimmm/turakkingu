@@ -1,0 +1,40 @@
+package web
+
+templ Layout() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Conversion Tracker</title>
+			<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+			<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+			<style>
+			.tab-active {
+				border-bottom: 2px solid #2563eb;
+				color: #2563eb;
+			}
+			.sub-tab-active {
+				background-color: #f3f4f6;
+				border: 1px solid #d1d5db;
+				border-bottom: 1px solid #f3f4f6;
+			}
+			.modal {
+				display: none;
+			}
+			.modal.show {
+				display: flex;
+			}
+			.tab-content {
+				display: block;
+			}
+		</style>
+		</head>
+		<body class="bg-gray-50">
+			<div class="max-w-7xl mx-auto p-6">
+				{ children... }
+			</div>
+			@Scripts()
+		</body>
+	</html>
+}

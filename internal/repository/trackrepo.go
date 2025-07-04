@@ -74,8 +74,8 @@ func (r *trackRepo) IsTrackIDExist(ctx context.Context, id bson.ObjectID) (bool,
 func (r *trackRepo) FindTrackByID(ctx context.Context, id bson.ObjectID) (*entity.Track, error) {
 	var track entity.Track
 	filter := bson.M{
-		"_id":       id,
-		"deletedAt": bson.M{"$exists": false},
+		"_id":        id,
+		"deleted_at": bson.M{"$exists": false},
 	}
 
 	err := r.collection.FindOne(ctx, filter).Decode(&track)
