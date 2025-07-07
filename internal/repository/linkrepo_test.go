@@ -182,3 +182,39 @@ func TestLinkRepo_FindAllLinkbyTenantID(t *testing.T) {
 		assert.Equal(t, len(foundLink), 2)
 	})
 }
+
+func TestLinkRepo_SearchLinks(t *testing.T) {
+	suite, err := setupTestSuiteLinkRepo()
+	assert.NoError(t, err)
+	defer suite.Cleanup()
+
+	ctx := context.Background()
+	t.Run("should find existing link", func(t *testing.T) {
+		link := &entity.Link{
+			TenantID: "tenant1",
+			Name:     "github",
+			Url:      "https://github.com/",
+		}
+		err := suite.repo.CreateLink(ctx, link)
+		assert.NoError(t, err)
+		link2 := &entity.Link{
+			TenantID: "tenant1",
+			Name:     "hacker news",
+			Url:      "https://news.ycombinator.com/",
+		}
+		err = suite.repo.CreateLink(ctx, link2)
+		assert.NoError(t, err)
+		link3 := &entity.Link{
+			TenantID: "tenant1",
+			Name:     "crypto 101",
+			Url:      "https://www.crypto101.io/",
+		}
+		err = suite.repo.CreateLink(ctx, link3)
+		assert.NoError(t, err)
+
+		foundLink, err := suite.repo.SearchLinks(ctx, "tenant1", "hacker news")
+
+		assert.NoError(t, err)
+		assert.Equal(t, len(foundLink), 1)
+	})
+}

@@ -12,6 +12,7 @@ type LinkUseCase interface {
 	CreateLink(context.Context, *entity.Link) error
 	GetLink(context.Context, string) (*entity.Link, error)
 	GetAllLinks(ctx context.Context, tenantID string) ([]*entity.Link, error)
+	SearchLinks(ctx context.Context, tenantID string, keywords string) ([]*entity.Link, error)
 }
 
 type linkUseCase struct {
@@ -52,4 +53,14 @@ func (uc *linkUseCase) GetAllLinks(ctx context.Context, tenantID string) ([]*ent
 	}
 
 	return links, err
+}
+
+func (uc *linkUseCase) SearchLinks(ctx context.Context, tenantID string, keywords string) ([]*entity.Link, error) {
+	links, err := uc.repo.SearchLinks(ctx, tenantID, keywords)
+	if err != nil {
+		slog.Error("failed to search links", slog.String("error", err.Error()))
+		return nil, err
+	}
+
+	return links, nil
 }

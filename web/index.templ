@@ -35,7 +35,6 @@ templ IndexPage(tracker *ConversionTracker) {
 		@AddModal()
 		@AddLandingPageModal()
 		@EditLandingPageModal()
-		@BulkEditLandingPageModal()
 	}
 }
 
@@ -458,76 +457,6 @@ templ EditLandingPageModal() {
 	</div>
 }
 
-// Bulk edit landing pages modal
-templ BulkEditLandingPageModal() {
-	<div id="bulkEditLandingPageModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center">
-		<div class="relative p-5 border w-96 shadow-lg rounded-md bg-white">
-			<div class="mt-3">
-				<h3 class="text-lg font-medium text-gray-900 mb-4">Edit Multiple Landing Pages</h3>
-				<p class="text-sm text-gray-600 mb-4">Changes will be applied to <span id="selectedCount">0</span> selected items.</p>
-				<form id="bulkEditLandingPageForm" hx-target="#landing-pages-table" hx-swap="innerHTML" hx-include="[name='selected']" onsubmit="return submitBulkEdit()">
-					<div class="mb-4">
-						<label class="block text-sm font-medium text-gray-700 mb-2">
-							<input type="checkbox" id="bulkEditFixedUrl" class="mr-2"/> Update Fixed URL
-						</label>
-						<input
-							type="text"
-							id="bulkFixedUrl"
-							name="fixed_url"
-							class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-							placeholder="Enter fixed URL"
-							disabled
-						/>
-					</div>
-					<div class="mb-4">
-						<label class="block text-sm font-medium text-gray-700 mb-2">
-							<input type="checkbox" id="bulkEditLandingPageName" class="mr-2"/> Update Landing Page Name
-						</label>
-						<input
-							type="text"
-							id="bulkLandingPageName"
-							name="landing_page_name"
-							class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-							placeholder="Enter landing page name"
-							disabled
-						/>
-					</div>
-					<div class="mb-4">
-						<label class="block text-sm font-medium text-gray-700 mb-2">
-							<input type="checkbox" id="bulkEditLandingPageUrl" class="mr-2"/> Update Landing Page URL
-						</label>
-						<input
-							type="text"
-							id="bulkLandingPageUrl"
-							name="landing_page_url"
-							class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-							placeholder="Enter landing page URL"
-							disabled
-						/>
-					</div>
-					<div class="mb-4">
-						<label class="block text-sm font-medium text-gray-700 mb-2">
-							<input type="checkbox" id="bulkEditStatus" class="mr-2"/> Update Status
-						</label>
-						<select id="bulkStatus" name="status" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" disabled>
-							<option value="Draft">Draft</option>
-							<option value="Active">Active</option>
-						</select>
-					</div>
-					<div class="flex items-center justify-end space-x-3">
-						<button type="button" onclick="hideBulkEditLandingPageModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-							Cancel
-						</button>
-						<button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
-							Update Selected
-						</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-}
-
 // JavaScript functions
 templ Scripts() {
 	<script>
@@ -547,22 +476,6 @@ templ Scripts() {
 			document.getElementById('addLandingPageModal').classList.remove('show');
 		}
 
-		function showBulkEditLandingPageModal() {
-			const selected = getSelectedLandingPages();
-			document.getElementById('selectedCount').textContent = selected.length;
-			document.getElementById('bulkEditLandingPageModal').classList.add('show');
-		}
-
-		function hideBulkEditLandingPageModal() {
-			document.getElementById('bulkEditLandingPageModal').classList.remove('show');
-			// Reset form
-			const checkboxes = ['bulkEditFixedUrl', 'bulkEditLandingPageName', 'bulkEditLandingPageUrl', 'bulkEditStatus'];
-			checkboxes.forEach(id => {
-				document.getElementById(id).checked = false;
-				toggleBulkField(id);
-			});
-		}
-
 		function checkForBulkEdit() {
 			// const selected = getSelectedLandingPages();
 			// // Show bulk edit dialog if more than one item is selected
@@ -574,45 +487,6 @@ templ Scripts() {
 		function getSelectedLandingPages() {
 			const checkboxes = document.querySelectorAll('input[name="selected"]:checked');
 			return Array.from(checkboxes).map(cb => cb.value);
-		}
-
-		function toggleBulkField(checkboxId) {
-			const checkbox = document.getElementById(checkboxId);
-			const fieldId = checkboxId.replace('bulkEdit', 'bulk');
-			const field = document.getElementById(fieldId);
-			
-			if (field) {
-				field.disabled = !checkbox.checked;
-				if (!checkbox.checked) {
-					field.value = '';
-				}
-			}
-		}
-
-		function submitBulkEdit() {
-			// Set the form action and add hidden fields for checkbox states
-			const form = document.getElementById('bulkEditLandingPageForm');
-			form.setAttribute('hx-post', '/landing-pages/bulk-edit');
-			
-			// Remove existing hidden fields
-			const existingHidden = form.querySelectorAll('input[type="hidden"][name^="update_"]');
-			existingHidden.forEach(input => input.remove());
-			
-			// Add hidden fields for checkbox states
-			const checkboxes = ['bulkEditFixedUrl', 'bulkEditLandingPageName', 'bulkEditLandingPageUrl', 'bulkEditStatus'];
-			checkboxes.forEach(id => {
-				const checkbox = document.getElementById(id);
-				if (checkbox && checkbox.checked) {
-					const hiddenField = document.createElement('input');
-					hiddenField.type = 'hidden';
-					hiddenField.name = 'update_' + id.replace('bulkEdit', '').toLowerCase().replace(/([A-Z])/g, '_$1').toLowerCase();
-					hiddenField.value = 'on';
-					form.appendChild(hiddenField);
-				}
-			});
-			
-			hideBulkEditLandingPageModal();
-			return true;
 		}
 
 		// Simple client-side tab switching with lazy loading
@@ -697,17 +571,6 @@ templ Scripts() {
 			htmx.process(event.detail.target);
 		});
 
-		// Initialize bulk edit field toggles
-		document.addEventListener('DOMContentLoaded', function() {
-			const bulkCheckboxes = ['bulkEditFixedUrl', 'bulkEditLandingPageName', 'bulkEditLandingPageUrl', 'bulkEditStatus'];
-			bulkCheckboxes.forEach(id => {
-				const checkbox = document.getElementById(id);
-				if (checkbox) {
-					checkbox.addEventListener('change', () => toggleBulkField(id));
-				}
-			});
-		});
-
 		function toggleAllCheckboxes(source) {
 			const checkboxes = document.querySelectorAll('input[name="selected"]');
 			checkboxes.forEach(checkbox => {
@@ -739,10 +602,5 @@ templ Scripts() {
 			}
 		});
 
-		document.getElementById('bulkEditLandingPageModal').addEventListener('click', function(e) {
-			if (e.target === this) {
-				hideBulkEditLandingPageModal();
-			}
-		});
 	</script>
 }

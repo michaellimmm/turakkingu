@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github/michaellimmm/turakkingu/internal/entity"
+	"log/slog"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -16,6 +17,7 @@ type LinkRepo interface {
 	FindLinkByID(context.Context, string) (*entity.Link, error)
 	FindLinkByShortID(context.Context, string) (*entity.Link, error)
 	FindAllLinkbyTenantID(ctx context.Context, tenantID string) ([]*entity.Link, error)
+	SearchLinks(ctx context.Context, tenantID string, keywords string) ([]*entity.Link, error)
 }
 
 type linkRepo struct {
@@ -99,4 +101,29 @@ func (r *linkRepo) FindAllLinkbyTenantID(ctx context.Context, tenantID string) (
 	return results, nil
 }
 
-func (r *linkRepo) SearchLinks() {}
+func (r *linkRepo) SearchLinks(ctx context.Context, tenantID string, keywords string) ([]*entity.Link, error) {
+	filter := bson.M{
+		"tenant_id": tenantID,
+		"$or": []bson.M{
+			{"url": bson.M{"$regex": keywords, "$options": "i"}},
+			{"name": bson.M{"$regex": keywords, "$options": "i"}},
+		},
+	}
+
+	opts := options.Find().
+		SetSort(bson.D{{Key: "updated_at", Value: -1}})
+	cursor, err := r.collection.Find(ctx, filter, opts)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, ErrNoEvents
+	} else if err != nil {
+		slog.Error("failed to search link", slog.String("error", err.Error()))
+		return nil, err
+	}
+
+	var results []*entity.Link
+	if err := cursor.All(ctx, &results); err != nil {
+		slog.Error("failed to search link", slog.String("error", err.Error()))
+		return nil, fmt.Errorf("failed to decode result: %w", err)
+	}
+	return results, nil
+}

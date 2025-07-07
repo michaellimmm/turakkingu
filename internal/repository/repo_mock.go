@@ -293,6 +293,21 @@ func (mr *MockRepoMockRecorder) IsTrackingSettingIDExist(ctx, id any) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsTrackingSettingIDExist", reflect.TypeOf((*MockRepo)(nil).IsTrackingSettingIDExist), ctx, id)
 }
 
+// SearchLinks mocks base method.
+func (m *MockRepo) SearchLinks(ctx context.Context, tenantID, keywords string) ([]*entity.Link, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SearchLinks", ctx, tenantID, keywords)
+	ret0, _ := ret[0].([]*entity.Link)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchLinks indicates an expected call of SearchLinks.
+func (mr *MockRepoMockRecorder) SearchLinks(ctx, tenantID, keywords any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchLinks", reflect.TypeOf((*MockRepo)(nil).SearchLinks), ctx, tenantID, keywords)
+}
+
 // UpdatePageFieldsAndReturn mocks base method.
 func (m *MockRepo) UpdatePageFieldsAndReturn(arg0 context.Context, arg1 bson.ObjectID, arg2 *entity.ThankYouPage) (*entity.ThankYouPage, error) {
 	m.ctrl.T.Helper()
@@ -595,6 +610,21 @@ func (m *MockRepoCloser) IsTrackingSettingIDExist(ctx context.Context, id bson.O
 func (mr *MockRepoCloserMockRecorder) IsTrackingSettingIDExist(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsTrackingSettingIDExist", reflect.TypeOf((*MockRepoCloser)(nil).IsTrackingSettingIDExist), ctx, id)
+}
+
+// SearchLinks mocks base method.
+func (m *MockRepoCloser) SearchLinks(ctx context.Context, tenantID, keywords string) ([]*entity.Link, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SearchLinks", ctx, tenantID, keywords)
+	ret0, _ := ret[0].([]*entity.Link)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchLinks indicates an expected call of SearchLinks.
+func (mr *MockRepoCloserMockRecorder) SearchLinks(ctx, tenantID, keywords any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchLinks", reflect.TypeOf((*MockRepoCloser)(nil).SearchLinks), ctx, tenantID, keywords)
 }
 
 // UpdatePageFieldsAndReturn mocks base method.
