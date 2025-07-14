@@ -107,6 +107,7 @@
     get() {
       // Try cookie first
       const cookieValue = utils.getCookie(CONFIG.cookieName);
+      console.log(cookieValue);
       if (cookieValue) {
         try {
           const identity = JSON.parse(
@@ -306,6 +307,8 @@
         this.session.isNew = true; // flag if data is not come from storage
       } else {
         this.session = this.identity.get();
+        console.log('go here');
+        console.log(this.session);
 
         if (!this.session) {
           // if we can't find any data from storage

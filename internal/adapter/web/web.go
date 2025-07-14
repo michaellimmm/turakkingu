@@ -5,7 +5,6 @@ import (
 	"github/michaellimmm/turakkingu/internal/core"
 	"github/michaellimmm/turakkingu/internal/usecase"
 
-	webui "github/michaellimmm/turakkingu/web"
 	"net/http"
 )
 
@@ -42,28 +41,6 @@ func (w *web) Close(ctx context.Context) error {
 	return w.server.Shutdown(ctx)
 }
 
-var conversionTracker = &webui.ConversionTracker{
-	ConversionPoints: []webui.ConversionPoint{
-		{ID: "1", Name: "RTG_C99104N99_Shot_P99_ランクル+コンパクトカー訴...", URL: "https://kinto-jp.com/kinto_one/lineup/toyota/?utm_s...", Status: "Draft"},
-		{ID: "2", Name: "RTG_C99104N99_Shot_P99_ランクル+コンパクトカー訴...", URL: "https://kinto-jp.com/kinto_one/lineup/toyota/noah/?utm...", Status: "Draft"},
-		{ID: "3", Name: "RTG_C99104N99_Shot_P99_ランクル+コンパクトカー訴...", URL: "https://kinto-jp.com/kinto_one/lineup/toyota/noah/?utm...", Status: "Draft"},
-		{ID: "4", Name: "RTG_C99104N99_Shot_P99_ランクル+コンパクトカー訴...", URL: "https://kinto-jp.com/kinto_one/lineup/toyota/noah/?utm...", Status: "Draft"},
-		{ID: "5", Name: "RTG_C99104N99_Shot_P99_ランクル+コンパクトカー訴...", URL: "https://kinto-jp.com/kinto_one/lineup/toyota/noah/?utm...", Status: "Draft"},
-		{ID: "6", Name: "RTG_C99104N99_Shot_P99_ランクル+コンパクトカー訴...", URL: "https://kinto-jp.com/kinto_one/lineup/toyota/noah/?utm...", Status: "Draft"},
-	},
-}
-
-var landingPageTracker = &webui.LandingPageTracker{
-	LandingPages: []webui.LandingPage{
-		{ID: "1", FixedURL: "https://example.z...", LandingPageName: "RTG_C99104N99_Shot_P99_ランクル+コ...", LandingPageURL: "https://kinto-jp.com/kinto_one/lineup/toyo..."},
-		{ID: "2", FixedURL: "https://example.z...", LandingPageName: "RTG_C99104N99_Shot_P99_ランクル+コ...", LandingPageURL: "https://kinto-jp.com/kinto_one/lineup/toyo..."},
-		{ID: "3", FixedURL: "https://example.z...", LandingPageName: "RTG_C99104N99_Shot_P99_ランクル+コ...", LandingPageURL: "https://kinto-jp.com/kinto_one/lineup/toyo..."},
-		{ID: "4", FixedURL: "https://example.z...", LandingPageName: "RTG_C99104N99_Shot_P99_ランクル+コ...", LandingPageURL: "https://kinto-jp.com/kinto_one/lineup/toyo..."},
-		{ID: "5", FixedURL: "https://example.z...", LandingPageName: "RTG_C99104N99_Shot_P99_ランクル+コ...", LandingPageURL: "https://kinto-jp.com/kinto_one/lineup/toyo..."},
-		{ID: "6", FixedURL: "https://example.z...", LandingPageName: "RTG_C99104N99_Shot_P99_ランクル+コ...", LandingPageURL: "https://kinto-jp.com/kinto_one/lineup/toyo..."},
-	},
-}
-
 type router struct {
 	linkWeb         *linkWeb
 	thankYouPageWeb *thankYouPageWeb
@@ -83,7 +60,6 @@ func (r *router) Mux() *http.ServeMux {
 	mux.HandleFunc("POST /landing-pages/search", r.linkWeb.Search)
 	mux.HandleFunc("POST /landing-pages/add", r.linkWeb.Create)
 	mux.HandleFunc("POST /landing-pages/edit/{id}", r.linkWeb.Edit)
-	mux.HandleFunc("POST /landing-pages/bulk-edit", r.linkWeb.BulkEdit)
 
 	return mux
 }

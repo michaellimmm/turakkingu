@@ -13,7 +13,7 @@ type Track struct {
 	EndUserID         string            `bson:"end_user_id" json:"end_user_id"`
 	SessionID         string            `bson:"session_id" json:"session_id"`
 	Platform          string            `bson:"platform" json:"platform"`
-	GeneratedFrom     string            `bson:"generated_from" json:"generated_from"`
+	GeneratedFrom     string            `bson:"generated_from" json:"generated_from"` // source
 	Metadata          map[string]string `bson:"metadata" json:"metadata"`
 	BaseEntity        `bson:",inline"`
 }
