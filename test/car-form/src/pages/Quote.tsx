@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 
 const Quote = () => {
   const { id } = useParams();
-  console.log('id', id);
   const navigate = useNavigate();
   const car = cars.find((c) => c.id === id);
 

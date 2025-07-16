@@ -46,10 +46,24 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 	component.Render(context.Background(), w)
 }
 
-func handleFilter(w http.ResponseWriter, r *http.Request) {
+func (t *thankYouPageWeb) handleFilter(w http.ResponseWriter, r *http.Request) {
 	_ = r.FormValue("status")
+	tenantID := r.FormValue("tenant_id")
 
-	component := webui.ConversionPointsTable([]webui.ConversionPoint{})
+	trackingSetting, _ := t.uc.GetTrackingSettingByTenantID(r.Context(), tenantID)
+
+	res := &webui.ConversionTracker{}
+	res.ConversionPoints = []webui.ConversionPoint{}
+	for _, page := range trackingSetting.ThankYouPages {
+		res.ConversionPoints = append(res.ConversionPoints, webui.ConversionPoint{
+			ID:     page.ID.Hex(),
+			Name:   page.Name,
+			URL:    page.URL,
+			Status: "Draft",
+		})
+	}
+
+	component := webui.ConversionPointsTable(res.ConversionPoints)
 	component.Render(context.Background(), w)
 }
 

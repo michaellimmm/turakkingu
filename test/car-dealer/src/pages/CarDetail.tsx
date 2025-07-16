@@ -131,7 +131,7 @@ const CarDetail = () => {
 
             <div className="space-y-4">
               <a
-                href={`http://cardealerform.local/quote/${car.id}`}
+                href={`http://car-form.ngrok.app/quote/${car.id}`}
                 className="block"
               >
                 <Button

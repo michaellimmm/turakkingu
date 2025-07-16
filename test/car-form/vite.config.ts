@@ -9,7 +9,7 @@ export default defineConfig({
   server: {
     port: 8082,
     host: true, // Needed to allow custom domains
-    allowedHosts: ['cardealer.local', 'tracker.local', 'cardealerform.local'],
+    allowedHosts: ['cardealer.local', 'tracker.local','zeals-tracker-api.ngrok.app', 'cardealerform.local', 'rental-car.ngrok.app', 'car-form.ngrok.app'],
   },
   resolve: {
     alias: {

@@ -8,7 +8,7 @@
 
   // Configuration defaults
   const CONFIG = {
-    endpoint: 'http://localhost:8080',
+    endpoint: 'https://zeals-tracker-api.ngrok.app',
     cookieName: '_zt_id',
     cookieMaxAge: 30 * 24 * 60 * 60, // 30 days
     storageKey: '_zt_identity',
@@ -40,16 +40,6 @@
       ].filter(Boolean);
 
       document.cookie = parts.join('; ');
-    },
-    generateId: function () {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-        /[xy]/g,
-        function (c) {
-          const r = (Math.random() * 16) | 0;
-          const v = c === 'x' ? r : (r & 0x3) | 0x8;
-          return v.toString(16);
-        }
-      );
     },
     hashString: function (str) {
       let hash = 0;
@@ -104,17 +94,30 @@
       this.cookieDomain = utils.detectCookieDomain();
     }
 
+    restorePadding(base64) {
+      const remainder = base64.length % 4;
+      if (remainder === 0) {
+        return base64;
+      }
+      if (remainder === 1) {
+        throw new Error("Invalid Base64 string (length mod 4 == 1).");
+      }
+      return base64 + "=".repeat(4 - remainder);
+    }
+
     get() {
       // Try cookie first
       const cookieValue = utils.getCookie(CONFIG.cookieName);
-      console.log(cookieValue);
       if (cookieValue) {
         try {
-          const identity = JSON.parse(
-            atob(cookieValue + '=='.slice((cookieValue.length % 4) % 2))
-          );
+          const padded = this.restorePadding(cookieValue);
+          const jsonString = atob(padded);
+
+          const identity = JSON.parse(jsonString);
           if (this.isValid(identity)) return identity;
-        } catch (e) {}
+        } catch (e) {
+          console.error(e);
+        }
       }
 
       // Try storage
@@ -150,6 +153,7 @@
 
     isValid(identity) {
       if (!identity || !identity.ztid) return false;
+      return true;
     }
 
     refresh() {
@@ -299,20 +303,25 @@
       this.dedup = new Deduplication();
     }
 
+    generateUUID() {
+      return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+      );
+    }
+
+
     async run() {
       const params = this.extractParams();
-
       if (params) {
         this.session = this.identity.set(params.ztid, params.ts);
         this.session.isNew = true; // flag if data is not come from storage
       } else {
         this.session = this.identity.get();
-        console.log('go here');
-        console.log(this.session);
 
         if (!this.session) {
           // if we can't find any data from storage
-          this.session = this.identity.set('original', Date.now());
+          var uuid = this.generateUUID();
+          this.session = this.identity.set(`web-${uuid}`, Date.now());
           this.session.isNew = true; // flag if data is not come from storage
         }
       }
@@ -412,6 +421,9 @@
       window.addEventListener('popstate', () => {
         this.track(); // Just track the new URL
       });
+
+      // immediately track
+      this.track()
     }
 
     setupCrossDomainPropagation() {

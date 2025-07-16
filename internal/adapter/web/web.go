@@ -51,7 +51,7 @@ func (r *router) Mux() *http.ServeMux {
 
 	mux.HandleFunc("GET /", r.thankYouPageWeb.Index)
 	mux.HandleFunc("POST /search", handleSearch)
-	mux.HandleFunc("POST /filter", handleFilter)
+	mux.HandleFunc("POST /filter", r.thankYouPageWeb.handleFilter)
 	mux.HandleFunc("POST /add", handleAdd)
 	mux.HandleFunc("POST /start-tracking", handleStartTracking)
 
