@@ -301,12 +301,28 @@
       this.identity = new Identity();
       this.fingerprint = new FingerprintManager();
       this.dedup = new Deduplication();
+      this._objectIdCounter = Math.floor(Math.random() * 0xffffff);
     }
 
-    generateUUID() {
-      return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-      );
+    generateObjectId() {
+      // 4-byte timestamp (seconds since Unix epoch)
+      const timestamp = Math.floor(Date.now() / 1000);
+      const timestampHex = timestamp.toString(16).padStart(8, '0');
+
+      // 5 random bytes
+      let randomBytes = '';
+      for (let i = 0; i < 5; i++) {
+        randomBytes += Math.floor(Math.random() * 256)
+            .toString(16)
+            .padStart(2, '0');
+      }
+
+      // 3-byte counter (incrementing)
+      this._objectIdCounter = (this._objectIdCounter + 1) % 0x1000000; // wrap around at 0xffffff
+      const counterHex = this._objectIdCounter.toString(16).padStart(6, '0');
+
+      // Concatenate all parts
+      return timestampHex + randomBytes + counterHex;
     }
 
 
@@ -320,8 +336,8 @@
 
         if (!this.session) {
           // if we can't find any data from storage
-          var uuid = this.generateUUID();
-          this.session = this.identity.set(`web-${uuid}`, Date.now());
+          var uuid = this.generateObjectId()
+          this.session = this.identity.set(uuid, Date.now());
           this.session.isNew = true; // flag if data is not come from storage
         }
       }
