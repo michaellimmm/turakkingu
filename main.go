@@ -248,6 +248,11 @@ func InsertThankYouPage(client *mongo.Client, ctx context.Context) {
 		log.Fatal("Invalid ObjectID:", err)
 	}
 
+	objectID5, err := bson.ObjectIDFromHex("11459be6ae3bd247fc9b4fd7")
+	if err != nil {
+		log.Fatal("Invalid ObjectID:", err)
+	}
+
 	timestamp, err := time.Parse(time.RFC3339, "2025-07-15T00:08:06.666Z")
 	if err != nil {
 		log.Fatal("Invalid timestamp:", err)
@@ -293,6 +298,16 @@ func InsertThankYouPage(client *mongo.Client, ctx context.Context) {
 			"url":                 "https://car-form.ngrok.app/thank-you",
 			"point":               0,
 			"name":                "Car form Thank you page",
+			"tracking_status":     1,
+			"created_at":          timestamp,
+			"updated_at":          timestamp,
+		},
+		bson.M{
+			"_id":                 objectID5,
+			"tracking_setting_id": ids[TrackingSetting][Tenant1],
+			"url":                 "https://awesomestoreyay.myshopify.com/checkouts/cn/40c565b13012d37a716d162d6b99c7b3/thank_you",
+			"point":               0,
+			"name":                "Shane website form Thank you page",
 			"tracking_status":     1,
 			"created_at":          timestamp,
 			"updated_at":          timestamp,
