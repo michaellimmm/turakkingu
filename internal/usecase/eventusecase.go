@@ -7,6 +7,7 @@ import (
 	"github/michaellimmm/turakkingu/internal/core"
 	"github/michaellimmm/turakkingu/internal/entity"
 	"github/michaellimmm/turakkingu/internal/repository"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 	"log/slog"
 	"net/url"
 
@@ -46,19 +47,21 @@ func (uc *eventUseCase) ProcessEvent(ctx context.Context, event *entity.Event) e
 		return err
 	} else if (err != nil && errors.Is(err, repository.ErrNoEvents)) || len(existingEvents) == 0 { // new event
 		track, err := uc.repo.FindTrackByID(ctx, trackID)
-		if err != nil {
+		if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
 			slog.Error("failed to get track by id", slog.String("error", err.Error()))
 			return err
 		}
 
-		// check if event url is equal with track url, it means user just open landing page
-		isMatch, err := uc.isQuerySubset(track.Url, event.Url)
-		if err != nil {
-			return err
-		}
+		if track != nil {
+			// check if event url is equal with track url, it means user just open landing page
+			isMatch, err := uc.isQuerySubset(track.Url, event.Url)
+			if err != nil {
+				return err
+			}
 
-		if !isMatch {
-			return nil
+			if !isMatch {
+				return nil
+			}
 		}
 
 		event.EventName = entity.EventNameLandingPage

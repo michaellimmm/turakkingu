@@ -151,6 +151,19 @@ templ ConversionSearchAndControls() {
 				</div>
 			</div>
 			<select
+                class="border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                hx-post="/filter"
+                hx-target="#conversion-table"
+                hx-swap="innerHTML"
+                name="tenant_id"
+            >
+                <option value="all">ALL</option>
+                <option value="tenant1">Tenant1</option>
+                <option value="ulototeseyalixun">中部電力（カテエネ会員登録</option>
+                <option value="irobotonlinestore">アイロボット オンラインストア</option>
+                <option value="esufajicopajaqoz">タカミスキンピール</option>
+            </select>
+			<select
 				class="border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
 				hx-post="/filter"
 				hx-target="#conversion-table"

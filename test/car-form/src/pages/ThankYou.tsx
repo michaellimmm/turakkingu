@@ -89,7 +89,7 @@ const ThankYou = () => {
               </div>
 
               <div className="space-y-4">
-                <a href="http://cardealer.local/" className="block">
+                <a href="http://rental-car.ngrok.app/" className="block">
                   <Button
                     size="lg"
                     className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 text-lg rounded-xl transition-all duration-300"

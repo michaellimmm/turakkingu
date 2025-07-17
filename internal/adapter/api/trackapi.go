@@ -178,6 +178,7 @@ func (t *trackAPI) TrackEvent(w http.ResponseWriter, r *http.Request) {
 		UserAgent:   r.UserAgent(),
 		Url:         req.URL,
 		PublishedAt: req.GetPublishedAt(),
+		Fingerprint: req.Fingerprint,
 	}
 	err := t.uc.ProcessEvent(r.Context(), event)
 	if err != nil {
